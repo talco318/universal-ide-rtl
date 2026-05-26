@@ -1,0 +1,55 @@
+{
+  "name": "universal-ide-rtl",
+  "displayName": "Universal IDE RTL Support",
+  "description": "Enables proper Right-to-Left (RTL) text rendering for Hebrew and Arabic in AI Chat across multiple IDEs (Kiro, Antigravity, Cursor, Windsurf).",
+  "publisher": "talco",
+  "version": "1.0.0",
+  "icon" : "icon.png",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Formatters",
+    "Other"
+  ],
+  "keywords": [
+    "rtl",
+    "hebrew",
+    "arabic",
+    "right-to-left",
+    "kiro",
+    "antigravity",
+    "cursor",
+    "windsurf",
+    "chat",
+    "he",
+    "ar",
+    "universal"
+  ],
+  "activationEvents": [
+    "*"
+  ],
+  "main": "./extension.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/talco318/universal-ide-rtl.git"
+  },
+  "bugs": {
+    "url": "https://github.com/talco318/universal-ide-rtl/issues"
+  },
+  "homepage": "https://github.com/talco318/universal-ide-rtl#readme",
+  "contributes": {
+    "commands": [
+      {
+        "command": "universal-rtl.toggle",
+        "title": "RTL: Toggle Status",
+        "category": "Universal RTL"
+      }
+    ]
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.80.0",
+    "@types/node": "16.x"
+  }
+}
