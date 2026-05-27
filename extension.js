@@ -1,8 +1,6 @@
 const vscode = require('vscode');
-const fs = require('fs');
-const path = require('path');
-const crypto = require('crypto');
 const { IDE_CONFIGS } = require('./ide-configs');
+const patcher = require('./patcher');
 
 let myStatusBarItem;
 
@@ -17,229 +15,15 @@ function detectIDE() {
 			return { id: key, ...config };
 		}
 	}
-	// Fallback: try generic VS Code-based detection
 	return null;
 }
-
-// ============================================================
-// CSS PATCH METHOD (for webview-based chats like Kiro)
-// ============================================================
-
-function getCssFilePath(config) {
-	const appRoot = vscode.env.appRoot;
-
-	// Try relative to appRoot
-	const cssPath = path.join(path.dirname(appRoot), config.cssPath);
-	if (fs.existsSync(cssPath)) return cssPath;
-
-	// Try via LOCALAPPDATA
-	if (config.altCssPath) {
-		const localAppData = process.env.LOCALAPPDATA || '';
-		const altPath = path.join(localAppData, config.altCssPath);
-		if (fs.existsSync(altPath)) return altPath;
-	}
-
-	return null;
-}
-
-function isCssPatched(config) {
-	const cssPath = getCssFilePath(config);
-	if (!cssPath) return false;
-	try {
-		const content = fs.readFileSync(cssPath, 'utf8');
-		return content.includes(config.marker);
-	} catch { return false; }
-}
-
-function enableCssPatch(config) {
-	const cssPath = getCssFilePath(config);
-	if (!cssPath) {
-		vscode.window.showErrorMessage(`RTL: ${config.name} CSS file not found.`);
-		return false;
-	}
-
-	try {
-		// Backup
-		const backupPath = cssPath + '.rtl-backup';
-		if (!fs.existsSync(backupPath)) {
-			fs.copyFileSync(cssPath, backupPath);
-		}
-
-		let content = fs.readFileSync(cssPath, 'utf8');
-
-		// Remove old patch if exists
-		if (content.includes(config.marker)) {
-			const markerEnd = config.marker.replace('START', 'END');
-			const startTag = `/* ===== ${config.marker} ===== */`;
-			const endTag = `/* ===== ${markerEnd} ===== */`;
-			const startIdx = content.indexOf(startTag);
-			const endIdx = content.indexOf(endTag) + endTag.length;
-			if (startIdx >= 0 && endIdx > startIdx) {
-				content = content.substring(0, startIdx) + content.substring(endIdx);
-			}
-		}
-
-		// Append new patch
-		const startTag = `/* ===== ${config.marker} ===== */`;
-		const endTag = `/* ===== ${config.marker.replace('START', 'END')} ===== */`;
-		const patch = `\n${startTag}\n${config.css}\n${endTag}\n`;
-		content += patch;
-
-		fs.writeFileSync(cssPath, content, 'utf8');
-		return true;
-	} catch (err) {
-		vscode.window.showErrorMessage(`RTL: Failed - ${err.message}`);
-		return false;
-	}
-}
-
-function disableCssPatch(config) {
-	const cssPath = getCssFilePath(config);
-	if (!cssPath) return false;
-
-	try {
-		const backupPath = cssPath + '.rtl-backup';
-		if (fs.existsSync(backupPath)) {
-			fs.copyFileSync(backupPath, cssPath);
-		} else {
-			let content = fs.readFileSync(cssPath, 'utf8');
-			const markerEnd = config.marker.replace('START', 'END');
-			const startTag = `/* ===== ${config.marker} ===== */`;
-			const endTag = `/* ===== ${markerEnd} ===== */`;
-			const startIdx = content.indexOf(startTag);
-			const endIdx = content.indexOf(endTag) + endTag.length;
-			if (startIdx >= 0 && endIdx > startIdx) {
-				content = content.substring(0, startIdx) + content.substring(endIdx);
-				fs.writeFileSync(cssPath, content, 'utf8');
-			}
-		}
-		return true;
-	} catch (err) {
-		vscode.window.showErrorMessage(`RTL: Failed - ${err.message}`);
-		return false;
-	}
-}
-
-// ============================================================
-// JS INJECT METHOD (for workbench-based chats like Antigravity)
-// ============================================================
-
-function getWorkbenchJsPath() {
-	const appRoot = vscode.env.appRoot;
-	return path.join(appRoot, 'out', 'vs', 'workbench', 'workbench.desktop.main.js');
-}
-
-function getProductJsonPath() {
-	const appRoot = vscode.env.appRoot;
-	return path.join(appRoot, 'product.json');
-}
-
-function updateChecksum(filePathInProduct, targetFilePath) {
-	const productJsonPath = getProductJsonPath();
-	if (!fs.existsSync(productJsonPath)) return;
-
-	try {
-		// Create backup if not exists
-		const backupPath = productJsonPath + '.rtl-backup';
-		if (!fs.existsSync(backupPath)) {
-			fs.copyFileSync(productJsonPath, backupPath);
-		}
-
-		// Calculate base64-encoded sha256 without padding
-		const fileContent = fs.readFileSync(targetFilePath);
-		const hash = crypto.createHash('sha256')
-			.update(fileContent)
-			.digest('base64')
-			.replace(/=+$/, '');
-
-		// Update product.json
-		const productJson = JSON.parse(fs.readFileSync(productJsonPath, 'utf8'));
-		if (productJson.checksums) {
-			productJson.checksums[filePathInProduct] = hash;
-			fs.writeFileSync(productJsonPath, JSON.stringify(productJson, null, '\t'), 'utf8');
-		}
-	} catch (err) {
-		console.error('Failed to update checksum:', err);
-	}
-}
-
-function restoreProductJson() {
-	const productJsonPath = getProductJsonPath();
-	const backupPath = productJsonPath + '.rtl-backup';
-	if (fs.existsSync(backupPath)) {
-		try {
-			fs.copyFileSync(backupPath, productJsonPath);
-			fs.unlinkSync(backupPath);
-		} catch (err) {
-			console.error('Failed to restore product.json backup:', err);
-		}
-	}
-}
-
-function isJsPatched(config) {
-	try {
-		const content = fs.readFileSync(getWorkbenchJsPath(), 'utf8');
-		return content.includes(config.marker);
-	} catch { return false; }
-}
-
-function enableJsInject(config) {
-	const jsPath = getWorkbenchJsPath();
-	try {
-		let content = fs.readFileSync(jsPath, 'utf8');
-
-		// Remove old patch if exists
-		if (content.includes(config.marker)) {
-			const regex = new RegExp(`\\/\\* ===== ${config.marker} ===== \\*\\/[\\s\\S]*?\\/\\* ===== ${config.marker.replace('START', 'END')} ===== \\*\\/`);
-			content = content.replace(regex, '');
-		}
-
-		// Append new patch
-		const startTag = `/* ===== ${config.marker} ===== */`;
-		const endTag = `/* ===== ${config.marker.replace('START', 'END')} ===== */`;
-		const patch = `\n${startTag}\n${config.script}\n${endTag}\n`;
-		fs.writeFileSync(jsPath, content + patch, 'utf8');
-
-		// Update product.json checksum for the modified js file
-		updateChecksum('vs/workbench/workbench.desktop.main.js', jsPath);
-
-		return true;
-	} catch (err) {
-		vscode.window.showErrorMessage(`RTL: Failed - ${err.message}`);
-		return false;
-	}
-}
-
-function disableJsInject(config) {
-	const jsPath = getWorkbenchJsPath();
-	try {
-		let content = fs.readFileSync(jsPath, 'utf8');
-		const regex = new RegExp(`\\/\\* ===== ${config.marker} ===== \\*\\/[\\s\\S]*?\\/\\* ===== ${config.marker.replace('START', 'END')} ===== \\*\\/`);
-		content = content.replace(regex, '');
-		fs.writeFileSync(jsPath, content.trim(), 'utf8');
-
-		// Restore product.json from backup
-		restoreProductJson();
-
-		return true;
-	} catch (err) {
-		vscode.window.showErrorMessage(`RTL: Failed - ${err.message}`);
-		return false;
-	}
-}
-
-// ============================================================
-// UNIFIED TOGGLE LOGIC
-// ============================================================
 
 function checkIsEnabled(ide) {
 	if (!ide) return false;
-	if (ide.method === 'css-patch') return isCssPatched(ide);
-	if (ide.method === 'js-inject') return isJsPatched(ide);
-	return false;
+	return patcher.isPatched(ide);
 }
 
-function toggleRtl() {
+function toggleRtl(extensionPath) {
 	const ide = detectIDE();
 	if (!ide) {
 		vscode.window.showErrorMessage('RTL: Unknown IDE. Cannot detect environment.');
@@ -249,22 +33,22 @@ function toggleRtl() {
 	const isEnabled = checkIsEnabled(ide);
 	let success = false;
 
-	if (isEnabled) {
-		if (ide.method === 'css-patch') success = disableCssPatch(ide);
-		else if (ide.method === 'js-inject') success = disableJsInject(ide);
-
-		if (success) {
-			updateStatusBar(false, ide.name);
-			promptRestart(`${ide.name} RTL Support Disabled.`);
+	try {
+		if (isEnabled) {
+			success = patcher.unpatch(ide);
+			if (success) {
+				updateStatusBar(false, ide.name);
+				promptRestart(`${ide.name} RTL Support Disabled.`);
+			}
+		} else {
+			success = patcher.patch(ide, extensionPath);
+			if (success) {
+				updateStatusBar(true, ide.name);
+				promptRestart(`${ide.name} RTL Support Enabled!`);
+			}
 		}
-	} else {
-		if (ide.method === 'css-patch') success = enableCssPatch(ide);
-		else if (ide.method === 'js-inject') success = enableJsInject(ide);
-
-		if (success) {
-			updateStatusBar(true, ide.name);
-			promptRestart(`${ide.name} RTL Support Enabled!`);
-		}
+	} catch (err) {
+		vscode.window.showErrorMessage(`RTL: Failed - ${err.message}`);
 	}
 }
 
@@ -289,12 +73,12 @@ function promptRestart(message) {
 	});
 }
 
-// ============================================================
-// ACTIVATION
-// ============================================================
-
 function activate(context) {
-	let toggleCmd = vscode.commands.registerCommand('universal-rtl.toggle', toggleRtl);
+	console.log('[Universal RTL] Extension activated.');
+	
+	let toggleCmd = vscode.commands.registerCommand('universal-rtl.toggle', () => {
+		toggleRtl(context.extensionPath);
+	});
 
 	myStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
 	myStatusBarItem.command = 'universal-rtl.toggle';

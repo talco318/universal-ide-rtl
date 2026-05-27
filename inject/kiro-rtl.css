@@ -1,0 +1,55 @@
+/* 1. Apply RTL to free text content only */
+.kiro-chat-message-body > div:not([class*="agent-"]),
+.kiro-chat-message-markdown p,
+.kiro-chat-message-markdown ul,
+.kiro-chat-message-markdown ol,
+.kiro-chat-message-markdown h1,
+.kiro-chat-message-markdown h2,
+.kiro-chat-message-markdown h3,
+.kiro-chat-message-markdown h4,
+.kiro-chat-message-markdown h5,
+.kiro-chat-message-markdown h6,
+.kiro-focus-area {
+  direction: rtl !important;
+  text-align: right !important;
+  unicode-bidi: plaintext !important;
+}
+
+/* 2. Fix code blocks - keep LTR */
+.kiro-chat-message pre,
+.kiro-chat-message code,
+.kiro-code-preview,
+pre code {
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: plaintext !important;
+  min-height: unset !important;
+  display: block;
+}
+
+/* 3. Protect system UI elements - always LTR */
+.agent-outcome-summary,
+[class*="agent-outcome"],
+[class*="step-container"],
+.kiro-chat-message-body button {
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: normal !important;
+}
+
+/* 4. Fix Hebrew lists padding */
+.kiro-chat-message-markdown ul,
+.kiro-chat-message-markdown ol {
+  padding-right: 1.5em !important;
+  padding-left: 0 !important;
+}
+
+/* 5. Inline code within sentences */
+.kiro-chat-message-markdown p code,
+.kiro-chat-message-markdown li code {
+  direction: ltr !important;
+  display: inline-block !important;
+  min-height: unset !important;
+  padding: 0 4px !important;
+  unicode-bidi: plaintext !important;
+}
