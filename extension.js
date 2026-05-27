@@ -23,7 +23,7 @@ function checkIsEnabled(ide) {
 	return patcher.isPatched(ide);
 }
 
-function toggleRtl(extensionPath) {
+function toggleRtl(extensionPath, context) {
 	const ide = detectIDE();
 	if (!ide) {
 		vscode.window.showErrorMessage('RTL: Unknown IDE. Cannot detect environment.');
@@ -37,12 +37,14 @@ function toggleRtl(extensionPath) {
 		if (isEnabled) {
 			success = patcher.unpatch(ide);
 			if (success) {
+				context.globalState.update('rtlEnabled', false);
 				updateStatusBar(false, ide.name);
 				promptRestart(`${ide.name} RTL Support Disabled.`);
 			}
 		} else {
 			success = patcher.patch(ide, extensionPath);
 			if (success) {
+				context.globalState.update('rtlEnabled', true);
 				updateStatusBar(true, ide.name);
 				promptRestart(`${ide.name} RTL Support Enabled!`);
 			}
@@ -77,14 +79,32 @@ function activate(context) {
 	console.log('[Universal RTL] Extension activated.');
 	
 	let toggleCmd = vscode.commands.registerCommand('universal-rtl.toggle', () => {
-		toggleRtl(context.extensionPath);
+		toggleRtl(context.extensionPath, context);
 	});
 
 	myStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
 	myStatusBarItem.command = 'universal-rtl.toggle';
 
 	const ide = detectIDE();
-	const currentState = checkIsEnabled(ide);
+	let currentState = checkIsEnabled(ide);
+
+	// Auto-repair logic: if state is enabled but files are not patched (e.g. after an IDE update)
+	if (ide && !currentState) {
+		const shouldBeEnabled = context.globalState.get('rtlEnabled', false);
+		if (shouldBeEnabled) {
+			console.log('[Universal RTL] Auto-repair: Patch was missing but state is enabled. Re-applying patch...');
+			try {
+				const success = patcher.patch(ide, context.extensionPath);
+				if (success) {
+					currentState = true;
+					promptRestart('Universal RTL Support was automatically restored after update.');
+				}
+			} catch (err) {
+				console.error('[Universal RTL] Auto-repair failed:', err);
+			}
+		}
+	}
+
 	updateStatusBar(currentState, ide?.name);
 
 	context.subscriptions.push(toggleCmd, myStatusBarItem);
