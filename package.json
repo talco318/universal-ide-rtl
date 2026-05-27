@@ -46,6 +46,13 @@
         "title": "RTL: Toggle Status",
         "category": "Universal RTL"
       }
+    ],
+    "keybindings": [
+      {
+        "command": "universal-rtl.toggle",
+        "key": "ctrl+alt+r",
+        "mac": "cmd+alt+r"
+      }
     ]
   },
   "devDependencies": {
