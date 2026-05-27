@@ -164,6 +164,66 @@ setTimeout(function() {
     observer.observe(document.body, { childList: true, subtree: true, characterData: true });
 }, 3000);
 `
+  },
+
+  // VS Code with GitHub Copilot Chat (uses workbench.html injection like copilot-chat-rtl)
+  vscode: {
+    name: 'VS Code (Copilot Chat)',
+    method: 'js-inject',
+    detect: (appRoot) => {
+      const lower = appRoot.toLowerCase();
+      // VS Code but not Kiro/Antigravity/Cursor/Windsurf
+      return (lower.includes('microsoft vs code') || lower.includes('code')) &&
+             !lower.includes('kiro') &&
+             !lower.includes('antigravity') &&
+             !lower.includes('cursor') &&
+             !lower.includes('windsurf');
+    },
+    marker: 'START-UNIVERSAL-RTL-JS',
+    script: `
+setTimeout(function() {
+    function enforceRTL() {
+        // Copilot Chat uses VS Code's built-in chat API - target .chat-widget selectors
+        const textElements = document.querySelectorAll(
+            '.interactive-result-editor .rendered-markdown p, ' +
+            '.interactive-result-editor .rendered-markdown li, ' +
+            '.interactive-result-editor .rendered-markdown h1, ' +
+            '.interactive-result-editor .rendered-markdown h2, ' +
+            '.interactive-result-editor .rendered-markdown h3, ' +
+            '.interactive-result-editor .rendered-markdown h4, ' +
+            '.interactive-item-container .value p, ' +
+            '.interactive-item-container .value li, ' +
+            '.chat-widget .rendered-markdown p, ' +
+            '.chat-widget .rendered-markdown li, ' +
+            '.chat-widget .rendered-markdown h1, ' +
+            '.chat-widget .rendered-markdown h2, ' +
+            '.chat-widget .rendered-markdown h3'
+        );
+
+        const rtlRegex = /[\\u0590-\\u05FF\\u0600-\\u06FF\\u0750-\\u077F\\u08A0-\\u08FF\\uFB50-\\uFDFF\\uFE70-\\uFEFF]/;
+
+        textElements.forEach(el => {
+            if (rtlRegex.test(el.textContent) && !el.closest('pre') && !el.closest('code') && !el.closest('button') && !el.closest('.code-block')) {
+                el.style.setProperty('direction', 'rtl', 'important');
+                el.style.setProperty('text-align', 'right', 'important');
+                el.style.setProperty('unicode-bidi', 'plaintext', 'important');
+            }
+        });
+
+        // Fix list padding for RTL
+        document.querySelectorAll('.interactive-result-editor .rendered-markdown ul, .interactive-result-editor .rendered-markdown ol, .chat-widget .rendered-markdown ul, .chat-widget .rendered-markdown ol').forEach(list => {
+            if (rtlRegex.test(list.textContent)) {
+                list.style.setProperty('padding-right', '1.5em', 'important');
+                list.style.setProperty('padding-left', '0', 'important');
+            }
+        });
+    }
+
+    enforceRTL();
+    const observer = new MutationObserver(() => enforceRTL());
+    observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+}, 3000);
+`
   }
 };
 

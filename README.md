@@ -15,6 +15,7 @@ One extension. All IDEs. Zero hassle.
 |-----|--------|--------|
 | **Kiro** | CSS Patch (webview) | ✅ Tested |
 | **Antigravity** | JS Injection (workbench) | ✅ Tested |
+| **VS Code (Copilot Chat)** | JS Injection (workbench) | ✅ Supported |
 | **Cursor** | JS Injection (workbench) | 🧪 Experimental |
 | **Windsurf** | JS Injection (workbench) | 🧪 Experimental |
 
