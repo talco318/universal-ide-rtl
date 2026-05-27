@@ -17,8 +17,8 @@
         const highLevelContainers = ['.interactive-session', '.chat-widget', '#workbench\\.panel\\.chat'];
         const lowLevelContainers = ['#conversation', '.chat-message', '.message-content'];
         
-        const highLevelTags = ['p', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'textarea', '[contenteditable="true"]', '.view-line'];
-        const lowLevelTags = ['p', 'li', 'span', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'textarea', '[contenteditable="true"]', '.whitespace-pre-wrap'];
+        const highLevelTags = ['p', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'textarea', '[contenteditable="true"]', '.view-line', 'table'];
+        const lowLevelTags = ['p', 'li', 'span', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'textarea', '[contenteditable="true"]', '.whitespace-pre-wrap', 'table'];
         
         const selectors = [];
         highLevelContainers.forEach(container => {
@@ -56,6 +56,10 @@
                 if (el.style.direction !== 'rtl') {
                     el.style.setProperty('direction', 'rtl', 'important');
                     el.style.setProperty('text-align', 'right', 'important');
+                    if (el.tagName === 'TABLE') {
+                        el.style.setProperty('margin-left', 'auto', 'important');
+                        el.style.setProperty('margin-right', '0', 'important');
+                    }
                     if (!isInput) {
                         el.style.setProperty('unicode-bidi', 'plaintext', 'important');
                     }
@@ -65,6 +69,10 @@
                 if (el.style.direction !== 'ltr') {
                     el.style.setProperty('direction', 'ltr', 'important');
                     el.style.setProperty('text-align', 'left', 'important');
+                    if (el.tagName === 'TABLE') {
+                        el.style.setProperty('margin-right', 'auto', 'important');
+                        el.style.setProperty('margin-left', '0', 'important');
+                    }
                     if (!isInput) {
                         el.style.setProperty('unicode-bidi', 'plaintext', 'important');
                     }
