@@ -30,7 +30,7 @@ One extension. All IDEs. Zero hassle.
 | **Kiro** | CSS Patch (webview) | ✅ Tested |
 | **Antigravity** | JS Injection (workbench) | ✅ Tested |
 | **VS Code (Copilot Chat)** | JS Injection (workbench) | ✅ Tested |
-| **Cursor** | JS Injection (workbench) | 🧪 Experimental |
+| **Cursor** | JS Injection (workbench) | ✅ Tested |
 | **Windsurf** | JS Injection (workbench) | 🧪 Experimental |
 
 ---
