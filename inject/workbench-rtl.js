@@ -22,6 +22,11 @@
         if (line.closest('.interactive-session') ||
             line.closest('.chat-widget') ||
             line.closest('#workbench\\.panel\\.chat') ||
+            line.closest('[id^="workbench\\.panel\\.aichat"]') || // Cursor Chat Panel
+            line.closest('.composer-bar') ||                     // Cursor Composer
+            line.closest('.composer-messages-container') ||      // Cursor Messages
+            line.closest('.ui-sidebar') ||                       // Cursor Sidebar
+            line.closest('.agent-prompt-input-root') ||           // Cursor Input Root
             line.closest('.interactive-input-part') ||
             line.closest('.chat-input') ||
             line.closest('.chat-input-container') ||
@@ -47,6 +52,10 @@
         if (el) {
             const text = el.textContent || '';
             el.style.setProperty('display', 'none', 'important');
+            const parent = el.closest('.statusbar-item');
+            if (parent) {
+                parent.style.setProperty('display', 'none', 'important');
+            }
             if (text.includes('RTLSTATE:ACTIVE')) {
                 isMainEditorRtlActive = true;
             }
@@ -153,39 +162,65 @@
         return false;
     }
 
+    const targetSelectors = [
+        // Cursor Chat elements
+        '.composer-messages-container p',
+        '.composer-messages-container span',
+        '.composer-bar textarea',
+        '.composer-bar [contenteditable="true"]',
+        '.composer-bar p',
+        '.markdown-root p',
+        '.markdown-root li',
+        '.markdown-root span',
+        '.composer-human-message p',
+        '.composer-human-message span',
+        '.ui-prompt-input-editor [contenteditable="true"]',
+        '.ui-prompt-input-editor p',
+        // Cursor Sidebar elements
+        '.ui-sidebar-menu-button-label',
+        // Standard VS Code / Antigravity elements
+        '.interactive-session p',
+        '.interactive-session li',
+        '.interactive-session textarea',
+        '.interactive-session [contenteditable="true"]',
+        '.chat-widget p',
+        '.chat-widget li',
+        '.chat-widget textarea',
+        '.chat-widget [contenteditable="true"]',
+        '.chat-message p',
+        '.chat-message li',
+        '.chat-message span',
+        '.message-content p',
+        '.message-content li',
+        '.message-content span',
+        '#conversation p',
+        '#conversation li',
+        '#conversation span',
+        '.interactive-input-part textarea',
+        '.interactive-input-part [contenteditable="true"]',
+        '.chat-input textarea',
+        '.chat-input [contenteditable="true"]',
+        '.chat-input-container textarea',
+        '.chat-input-container [contenteditable="true"]'
+    ];
+
+    const inputContainers = [
+        '.interactive-input-part', 
+        '.chat-input', 
+        '.chat-input-container', 
+        '.composer-bar',
+        '.ui-prompt-input'
+    ];
+
     function enforceRTL() {
         checkEditorRtlState();
-        const highLevelContainers = ['.interactive-session', '.chat-widget', '#workbench\\.panel\\.chat'];
-        const lowLevelContainers = ['#conversation', '.chat-message', '.message-content'];
         
-        const highLevelTags = ['p', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'textarea', '[contenteditable="true"]', 'table'];
-        const lowLevelTags = ['p', 'li', 'span', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'textarea', '[contenteditable="true"]', '.whitespace-pre-wrap', 'table'];
-        
-        const selectors = [];
-        highLevelContainers.forEach(container => {
-            highLevelTags.forEach(tag => {
-                selectors.push(container + ' ' + tag);
-            });
-        });
-        lowLevelContainers.forEach(container => {
-            lowLevelTags.forEach(tag => {
-                selectors.push(container + ' ' + tag);
-            });
-        });
-        
-        // Also allow matching the input containers themselves
-        const inputContainers = ['.interactive-input-part', '.chat-input', '.chat-input-container'];
-        inputContainers.forEach(container => {
-            selectors.push(container + ' textarea');
-            selectors.push(container + ' [contenteditable="true"]');
-        });
+        // 1. Process Monaco view-lines
+        // Handled dynamically inside checkEditorRtlState
 
-        const textElements = document.querySelectorAll(selectors.join(', '));
-        let styledCount = 0;
-        let ltrCount = 0;
-
+        // 2. Chat and text elements
+        const textElements = document.querySelectorAll(targetSelectors.join(', '));
         textElements.forEach(el => {
-            // Avoid changing inside code blocks, pre, buttons, or outcome summaries
             if (el.closest('pre') || el.closest('code') || el.closest('button') || el.closest('.agent-outcome-summary')) {
                 return;
             }
@@ -204,29 +239,24 @@
                     if (!isInput) {
                         el.style.setProperty('unicode-bidi', 'plaintext', 'important');
                     }
-                    styledCount++;
                 }
             } else {
-                if (el.style.direction === 'rtl') {
-                    el.style.removeProperty('direction');
-                    el.style.removeProperty('text-align');
+                // Prevent inheriting RTL from parents - force LTR for English/neutral text
+                if (el.style.direction !== 'ltr') {
+                    el.style.setProperty('direction', 'ltr', 'important');
+                    el.style.setProperty('text-align', 'left', 'important');
                     if (el.tagName === 'TABLE') {
-                        el.style.removeProperty('margin-left');
-                        el.style.removeProperty('margin-right');
+                        el.style.setProperty('margin-right', 'auto', 'important');
+                        el.style.setProperty('margin-left', '0', 'important');
                     }
                     if (!isInput) {
-                        el.style.removeProperty('unicode-bidi');
+                        el.style.setProperty('unicode-bidi', 'plaintext', 'important');
                     }
-                    ltrCount++;
                 }
             }
         });
 
-        if (styledCount > 0 || ltrCount > 0) {
-            console.log('[Universal RTL] Enforced text directions. RTL styled: ' + styledCount + ', LTR cleaned: ' + ltrCount);
-        }
-
-        // 2. Dynamically toggle RTL on input containers to keep cursor/layout aligned
+        // 3. Input containers alignment
         const inputParts = document.querySelectorAll(inputContainers.join(', '));
         inputParts.forEach(inputPart => {
             const text = inputPart.textContent || '';
@@ -237,20 +267,19 @@
                 if (currentDir !== 'rtl') {
                     inputPart.style.setProperty('direction', 'rtl', 'important');
                     inputPart.style.setProperty('text-align', 'right', 'important');
-                    console.log('[Universal RTL] Chat input container set to RTL:', inputPart);
                 }
             } else {
-                if (currentDir === 'rtl') {
-                    inputPart.style.removeProperty('direction');
-                    inputPart.style.removeProperty('text-align');
-                    console.log('[Universal RTL] Chat input container set to LTR:', inputPart);
+                // Force LTR for English input container
+                if (currentDir !== 'ltr') {
+                    inputPart.style.setProperty('direction', 'ltr', 'important');
+                    inputPart.style.setProperty('text-align', 'left', 'important');
                 }
             }
         });
 
-        // 3. Fix list padding for RTL lists
+        // 4. Fix list padding for RTL lists (Cursor and Standard)
         const listSelectors = [];
-        const chatContainers = [...highLevelContainers, ...lowLevelContainers];
+        const chatContainers = ['.interactive-session', '.chat-widget', '#workbench\\.panel\\.chat', '.composer-messages-container'];
         chatContainers.forEach(container => {
             listSelectors.push(container + ' ul');
             listSelectors.push(container + ' ol');
@@ -261,39 +290,45 @@
                 if (list.style.paddingRight !== '1.5em') {
                     list.style.setProperty('padding-right', '1.5em', 'important');
                     list.style.setProperty('padding-left', '0', 'important');
-                    console.log('[Universal RTL] List padded to right for RTL:', list);
                 }
             } else {
                 if (list.style.paddingRight === '1.5em') {
                     list.style.removeProperty('padding-right');
                     list.style.removeProperty('padding-left');
-                    console.log('[Universal RTL] List padded to left for LTR:', list);
                 }
             }
         });
     }
 
-    enforceRTL();
-    const observer = new MutationObserver((mutations) => {
-        let isRelevantMutation = false;
-        for (let i = 0; i < mutations.length; i++) {
-            if (mutations[i].addedNodes.length > 0 || mutations[i].type === 'characterData') {
-                isRelevantMutation = true;
-                break;
-            }
-        }
-        if (isRelevantMutation) {
+    // Performance scheduler (Debounce via requestAnimationFrame)
+    let isPending = false;
+    function scheduleRun() {
+        if (isPending) return;
+        isPending = true;
+        requestAnimationFrame(() => {
             enforceRTL();
             fixCursor();
-        }
+            isPending = false;
+        });
+    }
+
+    // Run initially
+    scheduleRun();
+
+    // Setup Mutation Observer with performance scheduling
+    if (window.universalRtlObserver) {
+        window.universalRtlObserver.disconnect();
+    }
+    const observer = new MutationObserver(() => {
+        scheduleRun();
     });
     observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+    window.universalRtlObserver = observer;
     
     // Also listen to input events on textareas/contenteditables for real-time RTL toggle while typing
     document.body.addEventListener('input', (e) => {
         if (e.target && (e.target.tagName === 'TEXTAREA' || e.target.getAttribute('contenteditable') === 'true')) {
-            enforceRTL();
-            fixCursor();
+            scheduleRun();
         }
     });
 
@@ -307,7 +342,9 @@
                                     activeEl.closest('.interactive-input-part') || 
                                     activeEl.closest('.chat-input') || 
                                     activeEl.closest('.chat-input-container') ||
-                                    activeEl.closest('.interactive-session');
+                                    activeEl.closest('.interactive-session') ||
+                                    activeEl.closest('.composer-bar') ||
+                                    activeEl.closest('.ui-prompt-input');
                 
                 if (isChatInput) {
                     e.preventDefault();
@@ -328,5 +365,7 @@
     }, true);
 
     // Track caret movement and selection changes to instantly align Monaco caret position in RTL lines
-    document.addEventListener('selectionchange', fixCursor);
+    document.addEventListener('selectionchange', () => {
+        scheduleRun();
+    });
 })();

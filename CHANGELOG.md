@@ -2,6 +2,27 @@
 
 All notable changes to the "Universal IDE RTL Support" extension will be documented in this file.
 
+## [1.3.0] - 2026-05-28
+
+### Added
+- Added full RTL and cursor positioning support inside the **Cursor AI Chat Panel** (including composer, markdown responses, and typed human messages).
+- Added RTL support for the **Cursor Workspace Sidebar** chat/agent titles.
+- Introduced explicit LTR styling overrides (`direction: ltr !important`) for English/neutral text to prevent inheriting RTL direction from parent containers.
+
+### Changed
+- Implemented asynchronous execution debouncing using `requestAnimationFrame` inside the injection client to completely resolve UI lag and infinite layout loop freezes.
+
+## [1.2.9] - 2026-05-28
+
+### Added
+- Added prominent manual activation warnings and instructions to `README.md` to guide users to toggle RTL ON and reload window after initial install.
+
+## [1.2.8] - 2026-05-28
+
+### Fixed
+- Fixed Monaco Editor RTL cursor positioning inside the Antigravity chat input by using `activeElement` selector fallback and wrapping cursor adjustments in a `setTimeout` tick.
+- Decoupled Monaco editor `.view-line` styling from the global editor active state class to allow independent RTL formatting inside sub-panels.
+
 ## [1.2.7] - 2026-05-28
 
 ### Fixed
