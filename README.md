@@ -7,6 +7,20 @@ A unified extension that adds Right-to-Left (RTL) text support for **Hebrew** an
 
 One extension. All IDEs. Zero hassle.
 
+
+> [!IMPORTANT]
+> **⚠️ Action Required After Installation / חובה לבצע לאחר ההתקנה! ⚠️**
+>
+> **English:** 
+> After installing, the RTL support is **disabled by default**. You **must** manually activate it:
+> 1. Click on **`RTL: OFF`** in the status bar (bottom-right corner) OR press **`Ctrl+Alt+R`** (Mac: `Cmd+Alt+R`) to toggle it.
+> 2. Click **Restart Now** when prompted to reload the window.
+>
+> **עברית:**
+> לאחר התקנת התוסף, התמיכה ב-RTL **כבויה כברירת מחדל**. **חובה** להפעיל אותה באופן ידני כדי שהיישור לימין יעבוד:
+> 1. לחץ על כפתור **`RTL: OFF`** בשורת הסטטוס למטה מימין, או לחץ על קיצור המקלדת **`Ctrl+Alt+R`** כדי להפעיל.
+> 2. לחץ על כפתור **Restart Now** בהודעה שתקפוץ כדי לטעון מחדש את חלון העורך ולהחיל את היישור!
+
 ---
 
 ## Supported IDEs
