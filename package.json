@@ -3,12 +3,15 @@
   "displayName": "Universal IDE RTL Support",
   "description": "Enables proper Right-to-Left (RTL) text rendering for Hebrew and Arabic in AI Chat across multiple IDEs (Kiro, Antigravity, Cursor, Windsurf).",
   "publisher": "talco",
-  "version": "1.1.4",
+  "version": "1.2.2",
   "icon": "icon.png",
   "license": "MIT",
   "engines": {
     "vscode": "^1.80.0"
   },
+  "extensionKind": [
+    "ui"
+  ],
   "categories": [
     "Formatters",
     "Other"
@@ -40,11 +43,24 @@
   },
   "homepage": "https://github.com/talco318/universal-ide-rtl#readme",
   "contributes": {
+    "markdown.markdownItPlugins": true,
+    "markdown.previewStyles": [
+      "./media/markdown-rtl.css"
+    ],
     "commands": [
       {
         "command": "universal-rtl.toggle",
         "title": "RTL: Toggle Status",
         "category": "Universal RTL"
+      },
+      {
+        "command": "universal-rtl.toggleEditorRtl",
+        "title": "RTL: Toggle Editor/Preview RTL",
+        "category": "Universal RTL",
+        "icon": {
+          "light": "media/align-right-light.svg",
+          "dark": "media/align-right-dark.svg"
+        }
       }
     ],
     "keybindings": [
@@ -53,7 +69,16 @@
         "key": "ctrl+alt+r",
         "mac": "cmd+alt+r"
       }
-    ]
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "universal-rtl.toggleEditorRtl",
+          "group": "navigation",
+          "when": "editorLangId == markdown || activeEditor == 'vscode.markdown.preview.editor'"
+        }
+      ]
+    }
   },
   "devDependencies": {
     "@types/vscode": "^1.80.0",

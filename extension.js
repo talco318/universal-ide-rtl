@@ -75,15 +75,96 @@ function promptRestart(message) {
 	});
 }
 
+const activeRtlFiles = new Set();
+let editorStateStatusBarItem;
+
+function updateEditorState() {
+	if (!editorStateStatusBarItem) return;
+	const activeEditor = vscode.window.activeTextEditor;
+	if (activeEditor) {
+		const fsPath = activeEditor.document.uri.fsPath;
+		const isRtl = activeRtlFiles.has(fsPath);
+		editorStateStatusBarItem.text = `RTLSTATE:${isRtl ? 'ACTIVE' : 'INACTIVE'}`;
+		console.log(`[Universal RTL Host] Active file: ${fsPath}, isRtl: ${isRtl}`);
+	} else {
+		editorStateStatusBarItem.text = 'RTLSTATE:INACTIVE';
+		console.log('[Universal RTL Host] No active editor, setting INACTIVE');
+	}
+	editorStateStatusBarItem.show();
+}
+
 function activate(context) {
 	console.log('[Universal RTL] Extension activated.');
+
+	// Load stored RTL files (convert old URI strings to fsPath for backward compatibility)
+	const storedFiles = context.workspaceState.get('activeRtlFiles', []);
+	storedFiles.forEach(f => {
+		if (f.startsWith('file://') || f.startsWith('vscode-')) {
+			try {
+				activeRtlFiles.add(vscode.Uri.parse(f).fsPath);
+			} catch {
+				activeRtlFiles.add(f);
+			}
+		} else {
+			activeRtlFiles.add(f);
+		}
+	});
 	
 	let toggleCmd = vscode.commands.registerCommand('universal-rtl.toggle', () => {
 		toggleRtl(context.extensionPath, context);
 	});
 
-	myStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
+	// Register editor toggle command
+	let toggleEditorCmd = vscode.commands.registerCommand('universal-rtl.toggleEditorRtl', (uri) => {
+		if (!uri) {
+			uri = vscode.window.activeTextEditor?.document.uri;
+		}
+		if (!uri) {
+			const activeTab = vscode.window.tabGroups?.activeTabGroup?.activeTab;
+			if (activeTab && activeTab.input && activeTab.input.uri) {
+				uri = activeTab.input.uri;
+			}
+		}
+		if (!uri) {
+			// Find any visible text editor that is a markdown file as a fallback
+			const visibleMarkdownEditor = vscode.window.visibleTextEditors.find(
+				e => e.document.languageId === 'markdown'
+			);
+			if (visibleMarkdownEditor) {
+				uri = visibleMarkdownEditor.document.uri;
+			}
+		}
+
+		if (!uri) {
+			vscode.window.showWarningMessage('RTL: No active editor file found to toggle.');
+			return;
+		}
+
+		const fsPath = uri.fsPath;
+		if (activeRtlFiles.has(fsPath)) {
+			activeRtlFiles.delete(fsPath);
+			vscode.window.showInformationMessage('RTL: Disabled for this editor/preview.');
+		} else {
+			activeRtlFiles.add(fsPath);
+			vscode.window.showInformationMessage('RTL: Enabled for this editor/preview.');
+		}
+
+		// Save state
+		context.workspaceState.update('activeRtlFiles', Array.from(activeRtlFiles));
+
+		// Update state
+		updateEditorState();
+
+		// Refresh markdown previews
+		vscode.commands.executeCommand('markdown.preview.refresh');
+	});
+
+	myStatusBarItem = vscode.window.createStatusBarItem('universal-rtl-status', vscode.StatusBarAlignment.Right, 100);
 	myStatusBarItem.command = 'universal-rtl.toggle';
+
+	editorStateStatusBarItem = vscode.window.createStatusBarItem('universal-rtl-editor-state', vscode.StatusBarAlignment.Right, 99);
+	editorStateStatusBarItem.tooltip = 'Universal RTL Editor State (Internal)';
+	updateEditorState();
 
 	const ide = detectIDE();
 	let currentState = checkIsEnabled(ide);
@@ -107,7 +188,28 @@ function activate(context) {
 
 	updateStatusBar(currentState, ide?.name);
 
-	context.subscriptions.push(toggleCmd, myStatusBarItem);
+	context.subscriptions.push(
+		toggleCmd,
+		toggleEditorCmd,
+		myStatusBarItem,
+		editorStateStatusBarItem,
+		vscode.window.onDidChangeActiveTextEditor(() => updateEditorState()),
+		vscode.workspace.onDidOpenTextDocument(() => updateEditorState())
+	);
+
+	// Return markdown-it contribution object with clean CSS wrapper for preview
+	return {
+		extendMarkdownIt(md) {
+			const originalRender = md.renderer.render;
+			md.renderer.render = function (tokens, options, env) {
+				let html = originalRender.apply(this, arguments);
+				const fsPath = (env && env.uri) ? env.uri.fsPath : '';
+				const isRtl = fsPath && activeRtlFiles.has(fsPath);
+				return `<div class="universal-markdown-body ${isRtl ? 'universal-md-rtl' : ''}">${html}</div>`;
+			};
+			return md;
+		}
+	};
 }
 
 function deactivate() { }

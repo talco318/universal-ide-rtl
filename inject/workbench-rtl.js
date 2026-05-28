@@ -1,6 +1,59 @@
 (function() {
     console.log('[Universal RTL] Workbench JS injection activated successfully.');
 
+    // Inject global editor RTL CSS rules
+    const styleEl = document.createElement('style');
+    styleEl.textContent = `
+        body.universal-editor-rtl .view-line {
+            direction: rtl !important;
+            text-align: right !important;
+        }
+        body.universal-editor-rtl .view-line * {
+            unicode-bidi: plaintext !important;
+        }
+    `;
+    document.head.appendChild(styleEl);
+
+    function checkEditorRtlState() {
+        const el = document.querySelector('[id*="universal-rtl-editor-state"]') || 
+                   Array.from(document.querySelectorAll('.statusbar-item')).find(item => item.textContent.includes('RTLSTATE:'));
+        
+        if (!el) {
+            return;
+        }
+
+        const text = el.textContent || '';
+        let state = 'INACTIVE';
+        if (text.includes('RTLSTATE:')) {
+            el.style.setProperty('display', 'none', 'important');
+            if (text.includes('RTLSTATE:ACTIVE')) {
+                state = 'ACTIVE';
+            }
+        }
+
+        if (state === 'ACTIVE') {
+            if (!document.body.classList.contains('universal-editor-rtl')) {
+                document.body.classList.add('universal-editor-rtl');
+                console.log('[Universal RTL Client] Editor RTL activated via status bar.');
+            }
+            document.querySelectorAll('.view-line').forEach(line => {
+                if (line.getAttribute('dir') !== 'rtl') {
+                    line.setAttribute('dir', 'rtl');
+                }
+            });
+        } else {
+            if (document.body.classList.contains('universal-editor-rtl')) {
+                document.body.classList.remove('universal-editor-rtl');
+                console.log('[Universal RTL Client] Editor RTL deactivated via status bar.');
+                document.querySelectorAll('.view-line').forEach(line => {
+                    if (line.getAttribute('dir') === 'rtl') {
+                        line.removeAttribute('dir');
+                    }
+                });
+            }
+        }
+    }
+
     function isRtlText(text) {
         if (!text) return false;
         const ltrRegex = /[a-zA-Z]/;
@@ -14,6 +67,7 @@
     }
 
     function enforceRTL() {
+        checkEditorRtlState();
         const highLevelContainers = ['.interactive-session', '.chat-widget', '#workbench\\.panel\\.chat'];
         const lowLevelContainers = ['#conversation', '.chat-message', '.message-content'];
         
