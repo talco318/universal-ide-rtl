@@ -1,0 +1,38 @@
+/* Styling for Universal IDE RTL Markdown Preview */
+.universal-markdown-body.universal-md-rtl {
+    direction: rtl !important;
+    text-align: right !important;
+}
+
+.universal-markdown-body.universal-md-rtl p,
+.universal-markdown-body.universal-md-rtl li,
+.universal-markdown-body.universal-md-rtl h1,
+.universal-markdown-body.universal-md-rtl h2,
+.universal-markdown-body.universal-md-rtl h3,
+.universal-markdown-body.universal-md-rtl h4,
+.universal-markdown-body.universal-md-rtl h5,
+.universal-markdown-body.universal-md-rtl h6,
+.universal-markdown-body.universal-md-rtl td,
+.universal-markdown-body.universal-md-rtl th,
+.universal-markdown-body.universal-md-rtl blockquote {
+    direction: rtl !important;
+    text-align: right !important;
+    unicode-bidi: plaintext !important;
+}
+
+/* Ensure code blocks, inline code, preformatted text remain LTR */
+.universal-markdown-body.universal-md-rtl pre,
+.universal-markdown-body.universal-md-rtl code,
+.universal-markdown-body.universal-md-rtl pre *,
+.universal-markdown-body.universal-md-rtl code * {
+    direction: ltr !important;
+    text-align: left !important;
+    unicode-bidi: normal !important;
+}
+
+/* Align lists nicely for RTL */
+.universal-markdown-body.universal-md-rtl ul,
+.universal-markdown-body.universal-md-rtl ol {
+    padding-right: 1.5em !important;
+    padding-left: 0 !important;
+}
