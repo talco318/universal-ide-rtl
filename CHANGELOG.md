@@ -2,6 +2,31 @@
 
 All notable changes to the "Universal IDE RTL Support" extension will be documented in this file.
 
+## [1.2.7] - 2026-05-28
+
+### Fixed
+- Fixed Monaco Editor caret (cursor) jumping/misalignment when pressing space in RTL text by dynamically recalculating caret visual offset based on the text bounding rect.
+
+## [1.2.6] - 2026-05-28
+
+### Fixed
+- Fixed rightmost word truncation/cutoff under the minimap boundary by adding `box-sizing: border-box !important` to the view-lines stylesheet and increasing the minimap padding-right offset to `25px`.
+
+## [1.2.5] - 2026-05-28
+
+### Fixed
+- Fixed right-aligned text being hidden/covered by the editor Minimap on the right by dynamically detecting minimap presence/width and applying padding-right to RTL `.view-line` elements.
+
+## [1.2.4] - 2026-05-28
+
+### Added
+- Added `RTL: Clear All RTL Editor/Preview Files` command (`universal-rtl.clearAllEditorRtl`) to reset/clear all stored RTL files from workspaceState.
+
+## [1.2.3] - 2026-05-28
+
+### Fixed
+- Fixed `Ctrl+A` / `Cmd+A` ("Select All") keyboard shortcut being swallowed inside chat inputs by adding a capturing-phase keyboard listener to manual trigger selection.
+
 ## [1.2.2] - 2026-05-28
 
 ### Added

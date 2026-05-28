@@ -85,7 +85,7 @@ function updateEditorState() {
 		const fsPath = activeEditor.document.uri.fsPath;
 		const isRtl = activeRtlFiles.has(fsPath);
 		editorStateStatusBarItem.text = `RTLSTATE:${isRtl ? 'ACTIVE' : 'INACTIVE'}`;
-		console.log(`[Universal RTL Host] Active file: ${fsPath}, isRtl: ${isRtl}`);
+		console.log(`[Universal RTL Host] Active file: ${fsPath}, isRtl: ${isRtl}. All RTL files: ${JSON.stringify(Array.from(activeRtlFiles))}`);
 	} else {
 		editorStateStatusBarItem.text = 'RTLSTATE:INACTIVE';
 		console.log('[Universal RTL Host] No active editor, setting INACTIVE');
@@ -188,9 +188,18 @@ function activate(context) {
 
 	updateStatusBar(currentState, ide?.name);
 
+	let clearCmd = vscode.commands.registerCommand('universal-rtl.clearAllEditorRtl', () => {
+		activeRtlFiles.clear();
+		context.workspaceState.update('activeRtlFiles', []);
+		updateEditorState();
+		vscode.commands.executeCommand('markdown.preview.refresh');
+		vscode.window.showInformationMessage('RTL: Cleared all stored editor/preview files.');
+	});
+
 	context.subscriptions.push(
 		toggleCmd,
 		toggleEditorCmd,
+		clearCmd,
 		myStatusBarItem,
 		editorStateStatusBarItem,
 		vscode.window.onDidChangeActiveTextEditor(() => updateEditorState()),
