@@ -3,7 +3,7 @@
   "displayName": "Universal IDE RTL Support",
   "description": "Enables proper Right-to-Left (RTL) text rendering for Hebrew and Arabic in AI Chat across multiple IDEs (Kiro, Antigravity, Cursor, Windsurf).",
   "publisher": "talco",
-  "version": "1.2.2",
+  "version": "1.2.8",
   "icon": "icon.png",
   "license": "MIT",
   "engines": {
@@ -61,6 +61,11 @@
           "light": "media/align-right-light.svg",
           "dark": "media/align-right-dark.svg"
         }
+      },
+      {
+        "command": "universal-rtl.clearAllEditorRtl",
+        "title": "RTL: Clear All RTL Editor/Preview Files",
+        "category": "Universal RTL"
       }
     ],
     "keybindings": [
