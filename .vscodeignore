@@ -1,0 +1,8 @@
+.env
+*.vsix
+.git/**
+.vscode/**
+node_modules/**
+test-hebrew.md
+.gitignore
+package-lock.json

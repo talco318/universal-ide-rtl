@@ -1,3 +1,2 @@
 .env
-*.vsix
 node_modules/
