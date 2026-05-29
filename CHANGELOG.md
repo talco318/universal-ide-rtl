@@ -2,6 +2,14 @@
 
 All notable changes to the "Universal IDE RTL Support" extension will be documented in this file.
 
+## [1.3.3] - 2026-05-29
+
+### Added
+- Updated `README.md` to fully document the Markdown Editor and Preview RTL toggle button and usage instructions.
+
+### Fixed
+- Fixed `Ctrl+A` / `Cmd+A` keyboard shortcut inside rich text editors (like Lexical inside Antigravity's chat panel) which previously triggered VS Code's global "Select All" in the active main text editor instead of selecting the chat message.
+
 ## [1.3.2] - 2026-05-29
 
 ### Fixed

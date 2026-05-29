@@ -169,9 +169,32 @@ function activate(context) {
 	const ide = detectIDE();
 	let currentState = checkIsEnabled(ide);
 
-	// Auto-repair logic: if state is enabled but files are not patched (e.g. after an IDE update)
-	if (ide && !currentState) {
-		const shouldBeEnabled = context.globalState.get('rtlEnabled', false);
+	// Auto-repair and Extension Update logic:
+	let repatchedOnUpdate = false;
+	const currentVersion = context.extension.packageJSON.version;
+	const lastVersion = context.globalState.get('extensionVersion');
+	const shouldBeEnabled = context.globalState.get('rtlEnabled', false);
+
+	if (ide && shouldBeEnabled && lastVersion !== currentVersion) {
+		console.log(`[Universal RTL] Extension updated from ${lastVersion} to ${currentVersion}. Re-applying patch...`);
+		try {
+			patcher.unpatch(ide);
+			const success = patcher.patch(ide, context.extensionPath);
+			if (success) {
+				currentState = true;
+				repatchedOnUpdate = true;
+				context.globalState.update('extensionVersion', currentVersion);
+				promptRestart(`Universal RTL Support was updated to version ${currentVersion}.`);
+			}
+		} catch (err) {
+			console.error('[Universal RTL] Auto-repatch on update failed:', err);
+		}
+	} else {
+		context.globalState.update('extensionVersion', currentVersion);
+	}
+
+	// If the patch is missing (e.g., after an IDE update) and we didn't just re-patch it due to an extension update
+	if (ide && !currentState && !repatchedOnUpdate) {
 		if (shouldBeEnabled) {
 			console.log('[Universal RTL] Auto-repair: Patch was missing but state is enabled. Re-applying patch...');
 			try {

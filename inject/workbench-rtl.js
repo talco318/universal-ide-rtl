@@ -378,11 +378,14 @@
 
     // Fix Ctrl+A / Cmd+A selection inside chat input window when focus is captured
     document.addEventListener('keydown', (e) => {
-        if ((e.ctrlKey || e.metaKey) && (e.key === 'a' || e.key === 'A')) {
+        const isCtrlA = (e.ctrlKey || e.metaKey) && (e.code === 'KeyA' || e.key === 'a' || e.key === 'A' || e.key === 'ש');
+        if (isCtrlA) {
             const activeEl = document.activeElement;
             if (activeEl) {
                 const isChatInput = activeEl.tagName === 'TEXTAREA' || 
+                                    activeEl.tagName === 'INPUT' ||
                                     activeEl.getAttribute('contenteditable') === 'true' || 
+                                    activeEl.closest('[contenteditable="true"]') ||
                                     activeEl.closest('.interactive-input-part') || 
                                     activeEl.closest('.chat-input') || 
                                     activeEl.closest('.chat-input-container') ||
@@ -392,15 +395,27 @@
                 
                 if (isChatInput) {
                     e.preventDefault();
-                    if (typeof activeEl.select === 'function') {
-                        activeEl.select();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                    
+                    const targetEl = activeEl.closest('[contenteditable="true"]') || activeEl;
+                    if (typeof targetEl.select === 'function') {
+                        targetEl.select();
                     } else {
-                        const range = document.createRange();
-                        range.selectNodeContents(activeEl);
                         const selection = window.getSelection();
                         if (selection) {
                             selection.removeAllRanges();
-                            selection.addRange(range);
+                            
+                            const text = targetEl.textContent || '';
+                            const isRtl = isRtlText(text);
+                            
+                            if (isRtl) {
+                                selection.setBaseAndExtent(targetEl, 0, targetEl, targetEl.childNodes.length);
+                            } else {
+                                const range = document.createRange();
+                                range.selectNodeContents(targetEl);
+                                selection.addRange(range);
+                            }
                         }
                     }
                 }

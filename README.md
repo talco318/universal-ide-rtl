@@ -40,6 +40,8 @@ One extension. All IDEs. Zero hassle.
 - 🌐 **Auto-Detection:** Automatically detects which IDE is running and applies the correct patching method.
 - 🧠 **Smart Formatting:** RTL for Hebrew/Arabic text, LTR preserved for code blocks, buttons, and system UI.
 - ⚡ **One-Click Toggle:** Enable/disable via Status Bar or Command Palette.
+- 🎹 **Keyboard Shortcut:** Toggle RTL status quickly using `Ctrl+Alt+R` (Mac: `Cmd+Alt+R`).
+- 🔧 **Auto-Repair:** Automatically restores the RTL patch after IDE updates on startup.
 - 🔌 **Extensible:** Add new IDEs by simply adding an entry to `ide-configs.js`.
 - 💾 **Safe:** Creates backups before patching, clean removal on disable.
 
@@ -51,6 +53,15 @@ One extension. All IDEs. Zero hassle.
 2. Click **RTL: OFF** in the Status Bar (bottom right) to enable.
 3. Or use Command Palette: `RTL: Toggle Status`
 4. Click **Restart Now** when prompted.
+
+---
+
+## Markdown Editor & Preview Alignment 📝
+
+The extension includes dedicated support for aligning text dynamically in the **Markdown Editor** and **Markdown Preview**:
+- 🎛️ **Toolbar Button:** When editing a `.md` file or viewing a Markdown Preview, a small align-right icon appears in the editor title bar (top right).
+- 🔄 **Independent Toggle:** Click the toolbar button (or press `Ctrl+Alt+R` / `Cmd+Alt+R`) to toggle RTL for that specific file. It will align Hebrew/Arabic lines in the source editor and render the markdown preview right-aligned.
+- 🧹 **Reset All Files:** Run the command `RTL: Clear All RTL Editor/Preview Files` from the Command Palette to reset all stored file alignments.
 
 ---
 
