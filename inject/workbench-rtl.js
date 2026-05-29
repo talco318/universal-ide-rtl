@@ -12,6 +12,42 @@
         .view-line[dir="rtl"] * {
             unicode-bidi: plaintext !important;
         }
+        
+        /* Force LTR and isolation for code elements inside chat/composer/etc. */
+        .interactive-session code, .interactive-session pre,
+        .chat-widget code, .chat-widget pre,
+        .chat-message code, .chat-message pre,
+        .message-content code, .message-content pre,
+        .composer-messages-container code, .composer-messages-container pre,
+        .composer-bar code, .composer-bar pre,
+        .ui-prompt-input-editor code, .ui-prompt-input-editor pre,
+        #conversation code, #conversation pre,
+        .inline-chat code, .inline-chat pre,
+        .interactive-editor code, .interactive-editor pre {
+            direction: ltr !important;
+            text-align: left !important;
+            unicode-bidi: isolate !important;
+        }
+        
+        /* Inline code elements within sentences */
+        .interactive-session p code, .interactive-session li code,
+        .chat-widget p code, .chat-widget li code,
+        .chat-message p code, .chat-message li code,
+        .message-content p code, .message-content li code,
+        .composer-messages-container p code, .composer-messages-container li code,
+        #conversation p code, #conversation li code,
+        .inline-chat p code, .inline-chat li code,
+        .interactive-editor p code, .interactive-editor li code {
+            display: inline-block !important;
+            padding: 0 4px !important;
+        }
+
+        /* Ensure multiline pre blocks remain block layout */
+        .interactive-session pre, .chat-widget pre, .chat-message pre,
+        .message-content pre, .composer-messages-container pre, .composer-bar pre,
+        #conversation pre, .inline-chat pre, .interactive-editor pre {
+            display: block !important;
+        }
     `;
     document.head.appendChild(styleEl);
 
@@ -163,6 +199,10 @@
     }
 
     const targetSelectors = [
+        // Rich text contenteditable containers (e.g. Lexical)
+        '[contenteditable="true"]',
+        '[contenteditable="true"] p',
+        '[contenteditable="true"] span',
         // Cursor Chat elements
         '.composer-messages-container p',
         '.composer-messages-container span',
@@ -225,33 +265,37 @@
                 return;
             }
 
-            const isInput = el.tagName === 'TEXTAREA' || el.getAttribute('contenteditable') === 'true';
+            const isInput = el.tagName === 'TEXTAREA' || 
+                            el.getAttribute('contenteditable') === 'true' ||
+                            el.closest('[contenteditable="true"]');
             const text = el.tagName === 'TEXTAREA' ? el.value : el.textContent;
 
             if (isRtlText(text)) {
-                if (el.style.direction !== 'rtl') {
+                const targetBidi = isInput ? 'normal' : 'plaintext';
+                const currentDir = el.style.getPropertyValue('direction');
+                const currentBidi = el.style.getPropertyValue('unicode-bidi');
+                if (currentDir !== 'rtl' || currentBidi !== targetBidi) {
                     el.style.setProperty('direction', 'rtl', 'important');
                     el.style.setProperty('text-align', 'right', 'important');
                     if (el.tagName === 'TABLE') {
                         el.style.setProperty('margin-left', 'auto', 'important');
                         el.style.setProperty('margin-right', '0', 'important');
                     }
-                    if (!isInput) {
-                        el.style.setProperty('unicode-bidi', 'plaintext', 'important');
-                    }
+                    el.style.setProperty('unicode-bidi', targetBidi, 'important');
                 }
             } else {
                 // Prevent inheriting RTL from parents - force LTR for English/neutral text
-                if (el.style.direction !== 'ltr') {
+                const targetBidi = isInput ? 'normal' : 'plaintext';
+                const currentDir = el.style.getPropertyValue('direction');
+                const currentBidi = el.style.getPropertyValue('unicode-bidi');
+                if (currentDir !== 'ltr' || currentBidi !== targetBidi) {
                     el.style.setProperty('direction', 'ltr', 'important');
                     el.style.setProperty('text-align', 'left', 'important');
                     if (el.tagName === 'TABLE') {
                         el.style.setProperty('margin-right', 'auto', 'important');
                         el.style.setProperty('margin-left', '0', 'important');
                     }
-                    if (!isInput) {
-                        el.style.setProperty('unicode-bidi', 'plaintext', 'important');
-                    }
+                    el.style.setProperty('unicode-bidi', targetBidi, 'important');
                 }
             }
         });

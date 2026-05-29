@@ -2,6 +2,12 @@
 
 All notable changes to the "Universal IDE RTL Support" extension will be documented in this file.
 
+## [1.3.2] - 2026-05-29
+
+### Fixed
+- Fixed browser caret (cursor) misalignment and jump issues inside rich contenteditable text inputs (such as the Lexical-based input box in Antigravity) when typing RTL text and trailing spaces.
+- Resolved layout and symbol rendering bugs inside inline code elements (`code` and `pre` tags) inside chat bubbles by enforcing LTR formatting and isolation.
+
 ## [1.3.0] - 2026-05-28
 
 ### Added
