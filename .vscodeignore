@@ -6,3 +6,4 @@ node_modules/**
 test-hebrew.md
 .gitignore
 package-lock.json
+create-release.js
