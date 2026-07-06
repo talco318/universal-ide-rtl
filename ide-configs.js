@@ -135,9 +135,14 @@ const IDE_CONFIGS = {
     method: 'css-patch',
     detect: (appRoot) => appRoot.toLowerCase().includes('kiro'),
     // Path to the chat webview CSS file (relative to app root's parent)
-    cssPath: 'app/extensions/kiro.kiro-agent/packages/continuedev/gui/dist/assets/index.css',
+    cssPath: 'app/extensions/kiro.kiro-agent/packages/kiro-ui-agent-chat/dist/style.css',
     // Alternative path via LOCALAPPDATA
-    altCssPath: 'Programs/Kiro/resources/app/extensions/kiro.kiro-agent/packages/continuedev/gui/dist/assets/index.css',
+    altCssPath: 'Programs/Kiro/resources/app/extensions/kiro.kiro-agent/packages/kiro-ui-agent-chat/dist/style.css',
+    // Legacy paths for older Kiro versions
+    legacyCssPaths: [
+      'app/extensions/kiro.kiro-agent/packages/continuedev/gui/dist/assets/index.css',
+      'Programs/Kiro/resources/app/extensions/kiro.kiro-agent/packages/continuedev/gui/dist/assets/index.css'
+    ],
     marker: 'START-UNIVERSAL-RTL'
   },
 
