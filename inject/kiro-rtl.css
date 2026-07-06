@@ -1,4 +1,123 @@
-/* 1. Apply RTL to free text content only */
+/* ===================================================
+   Universal RTL — Kiro Chat Webview CSS Patch
+   Targets the new Kiro UI (kiro-ui-agent-chat)
+   =================================================== */
+
+/* 1. Apply RTL to free text content in session messages */
+.session-view-content p,
+.session-view-content li,
+.session-view-content h1,
+.session-view-content h2,
+.session-view-content h3,
+.session-view-content h4,
+.session-view-content h5,
+.session-view-content h6,
+.session-view-content blockquote,
+.session-view-content td,
+.session-view-content th {
+  direction: rtl !important;
+  text-align: right !important;
+  unicode-bidi: plaintext !important;
+}
+
+/* 2. Also target root-level text elements (messages rendered directly under divs) */
+.session-manager-content p,
+.session-manager-content li,
+.session-manager-content h1,
+.session-manager-content h2,
+.session-manager-content h3,
+.session-manager-content h4,
+.session-manager-content h5,
+.session-manager-content h6 {
+  direction: rtl !important;
+  text-align: right !important;
+  unicode-bidi: plaintext !important;
+}
+
+/* 3. Generic fallback — any p/li/h inside #root that isn't in code */
+#root p,
+#root li,
+#root h1,
+#root h2,
+#root h3,
+#root h4,
+#root h5,
+#root h6,
+#root blockquote {
+  direction: rtl !important;
+  text-align: right !important;
+  unicode-bidi: plaintext !important;
+}
+
+/* 4. Keep code blocks LTR */
+pre,
+code,
+pre *,
+code *,
+.kiro-inline-diff,
+.kiro-inline-diff *,
+.kiro-inline-diff-content,
+.kiro-inline-diff-content * {
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: normal !important;
+}
+
+/* 5. Inline code within sentences — keep LTR but inline */
+p code,
+li code {
+  direction: ltr !important;
+  display: inline-block !important;
+  min-height: unset !important;
+  padding: 0 4px !important;
+  unicode-bidi: normal !important;
+}
+
+/* 6. Protect system UI elements — always LTR */
+button,
+[class*="agent-outcome"],
+[class*="step-container"],
+.kiro-turn-usage-summary,
+.kiro-inline-diff-header,
+.kiro-inline-diff-stats,
+.kiro-command-cwd,
+.tab-bar-item,
+.session-history-item,
+.kiro-hook-card,
+.kiro-dropdown {
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: normal !important;
+}
+
+/* 7. Fix Hebrew lists padding */
+.session-view-content ul,
+.session-view-content ol,
+.session-manager-content ul,
+.session-manager-content ol,
+#root ul,
+#root ol {
+  padding-right: 1.5em !important;
+  padding-left: 0 !important;
+}
+
+/* 8. Tables — align right for RTL */
+.session-view-content table,
+.session-manager-content table,
+#root table {
+  direction: rtl !important;
+  margin-left: auto !important;
+  margin-right: 0 !important;
+}
+
+/* 9. Input area (Monaco editor view-lines) */
+.editor-instance .view-line {
+  unicode-bidi: plaintext !important;
+}
+
+/* ===================================================
+   Legacy selectors — for older Kiro versions
+   =================================================== */
 .kiro-chat-message-body > div:not([class*="agent-"]),
 .kiro-chat-message-markdown p,
 .kiro-chat-message-markdown ul,
@@ -15,19 +134,19 @@
   unicode-bidi: plaintext !important;
 }
 
-/* 2. Fix code blocks - keep LTR */
+/* Legacy: code blocks */
 .kiro-chat-message pre,
 .kiro-chat-message code,
 .kiro-code-preview,
 pre code {
   direction: ltr !important;
   text-align: left !important;
-  unicode-bidi: plaintext !important;
+  unicode-bidi: normal !important;
   min-height: unset !important;
   display: block;
 }
 
-/* 3. Protect system UI elements - always LTR */
+/* Legacy: system UI */
 .agent-outcome-summary,
 [class*="agent-outcome"],
 [class*="step-container"],
@@ -37,14 +156,14 @@ pre code {
   unicode-bidi: normal !important;
 }
 
-/* 4. Fix Hebrew lists padding */
+/* Legacy: list padding */
 .kiro-chat-message-markdown ul,
 .kiro-chat-message-markdown ol {
   padding-right: 1.5em !important;
   padding-left: 0 !important;
 }
 
-/* 5. Inline code within sentences */
+/* Legacy: inline code */
 .kiro-chat-message-markdown p code,
 .kiro-chat-message-markdown li code {
   direction: ltr !important;

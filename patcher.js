@@ -64,13 +64,26 @@ function getWorkbenchJsPath() {
 
 function getCssFilePath(config) {
 	const appRoot = vscode.env.appRoot;
+	const localAppData = process.env.LOCALAPPDATA || '';
+
 	const cssPath = path.join(path.dirname(appRoot), config.cssPath);
 	if (fs.existsSync(cssPath)) return cssPath;
 
-	if (config.altCssPath) {
-		const localAppData = process.env.LOCALAPPDATA || '';
+	if (config.altCssPath && localAppData) {
 		const altPath = path.join(localAppData, config.altCssPath);
 		if (fs.existsSync(altPath)) return altPath;
+	}
+
+	// Try legacy paths for older versions
+	if (config.legacyCssPaths) {
+		for (const legacyPath of config.legacyCssPaths) {
+			const fullPath = path.join(path.dirname(appRoot), legacyPath);
+			if (fs.existsSync(fullPath)) return fullPath;
+			if (localAppData) {
+				const altLegacyPath = path.join(localAppData, legacyPath);
+				if (fs.existsSync(altLegacyPath)) return altLegacyPath;
+			}
+		}
 	}
 	return null;
 }
