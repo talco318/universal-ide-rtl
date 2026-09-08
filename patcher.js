@@ -8,36 +8,126 @@ function getProductJsonPath() {
 	return path.join(appRoot, 'product.json');
 }
 
-function updateChecksum(filePathInProduct, targetFilePath) {
-	const productJsonPath = getProductJsonPath();
-	if (!fs.existsSync(productJsonPath)) {
-		console.warn(`[Universal RTL Patcher] product.json not found at ${productJsonPath}. Skipping checksum update.`);
-		return;
-	}
+/**
+ * Compute SHA-256 hash of a file in the format VS Code expects.
+ * @param {string} filePath - absolute path to the file
+ * @returns {string} base64-encoded SHA-256 hash (trailing '=' stripped)
+ */
+function computeFileHash(filePath) {
+	const fileContent = fs.readFileSync(filePath);
+	return crypto.createHash('sha256')
+		.update(fileContent)
+		.digest('base64')
+		.replace(/=+$/, '');
+}
 
+/**
+ * Backup product.json if no backup exists yet.
+ * @param {string} productJsonPath
+ * @returns {boolean} true if backup exists (created or pre-existing)
+ */
+function ensureProductJsonBackup(productJsonPath) {
+	const backupPath = productJsonPath + '.rtl-backup';
 	try {
-		const backupPath = productJsonPath + '.rtl-backup';
 		if (!fs.existsSync(backupPath)) {
 			fs.copyFileSync(productJsonPath, backupPath);
 			console.log(`[Universal RTL Patcher] Created backup of product.json at ${backupPath}`);
 		}
+		return true;
+	} catch (err) {
+		console.error('[Universal RTL Patcher] Failed to create product.json backup:', err);
+		return false;
+	}
+}
 
-		const fileContent = fs.readFileSync(targetFilePath);
-		const hash = crypto.createHash('sha256')
-			.update(fileContent)
-			.digest('base64')
-			.replace(/=+$/, '');
+/**
+ * Recompute and update ALL checksums in product.json so the IDE
+ * integrity check passes after we patched workbench files.
+ * @returns {{ success: boolean, updated: number, total: number, message: string }}
+ */
+function fixAllChecksums() {
+	const productJsonPath = getProductJsonPath();
 
+	if (!fs.existsSync(productJsonPath)) {
+		return { success: false, updated: 0, total: 0, message: `product.json not found at ${productJsonPath}` };
+	}
+
+	try {
+		const appRoot = vscode.env.appRoot;
 		const productJson = JSON.parse(fs.readFileSync(productJsonPath, 'utf8'));
-		if (productJson.checksums) {
-			productJson.checksums[filePathInProduct] = hash;
-			fs.writeFileSync(productJsonPath, JSON.stringify(productJson, null, '\t'), 'utf8');
-			console.log(`[Universal RTL Patcher] Updated product.json checksum for '${filePathInProduct}' to: ${hash}`);
-		} else {
-			console.warn('[Universal RTL Patcher] No checksums object found in product.json.');
+
+		if (!productJson.checksums || Object.keys(productJson.checksums).length === 0) {
+			return { success: true, updated: 0, total: 0, message: 'No checksums found in product.json — IDE does not use checksum verification.' };
 		}
+
+		ensureProductJsonBackup(productJsonPath);
+
+		const entries = Object.keys(productJson.checksums);
+		let updated = 0;
+
+		for (const fileKey of entries) {
+			// VS Code stores keys like "vs/workbench/workbench.desktop.main.js"
+			// The actual file is at <appRoot>/out/<fileKey>
+			const filePath = path.join(appRoot, 'out', fileKey);
+			if (!fs.existsSync(filePath)) {
+				console.warn(`[Universal RTL Patcher] Checksummed file not found: ${filePath} (key: ${fileKey})`);
+				continue;
+			}
+
+			const newHash = computeFileHash(filePath);
+			if (newHash !== productJson.checksums[fileKey]) {
+				productJson.checksums[fileKey] = newHash;
+				updated++;
+				console.log(`[Universal RTL Patcher] Updated checksum for '${fileKey}'`);
+			}
+		}
+
+		if (updated > 0) {
+			fs.writeFileSync(productJsonPath, JSON.stringify(productJson, null, '\t'), 'utf8');
+			console.log(`[Universal RTL Patcher] Wrote ${updated} updated checksum(s) to product.json`);
+
+			// Verify the write succeeded by reading back
+			const verifyJson = JSON.parse(fs.readFileSync(productJsonPath, 'utf8'));
+			if (!verifyJson.checksums) {
+				return { success: false, updated, total: entries.length, message: 'Verification failed — product.json was written but checksums are missing on re-read.' };
+			}
+		}
+
+		return { success: true, updated, total: entries.length, message: `${updated} of ${entries.length} checksum(s) updated successfully.` };
+	} catch (err) {
+		return { success: false, updated: 0, total: 0, message: `Failed to fix checksums: ${err.message}` };
+	}
+}
+
+/**
+ * Update checksum for a single file in product.json.
+ * Falls back to fixAllChecksums for robustness.
+ * @returns {{ success: boolean, message: string }}
+ */
+function updateChecksum(filePathInProduct, targetFilePath) {
+	const productJsonPath = getProductJsonPath();
+	if (!fs.existsSync(productJsonPath)) {
+		return { success: false, message: `product.json not found at ${productJsonPath}` };
+	}
+
+	try {
+		ensureProductJsonBackup(productJsonPath);
+
+		const hash = computeFileHash(targetFilePath);
+		const productJson = JSON.parse(fs.readFileSync(productJsonPath, 'utf8'));
+
+		if (!productJson.checksums) {
+			// Some IDE builds don't have checksums — nothing to update
+			return { success: true, message: 'No checksums object in product.json — skipping (IDE may not use checksum verification).' };
+		}
+
+		productJson.checksums[filePathInProduct] = hash;
+		fs.writeFileSync(productJsonPath, JSON.stringify(productJson, null, '\t'), 'utf8');
+		console.log(`[Universal RTL Patcher] Updated checksum for '${filePathInProduct}' to: ${hash}`);
+		return { success: true, message: `Checksum updated for ${filePathInProduct}` };
 	} catch (err) {
 		console.error('[Universal RTL Patcher] Failed to update checksum:', err);
+		return { success: false, message: `Failed to update checksum: ${err.message}` };
 	}
 }
 
@@ -49,11 +139,15 @@ function restoreProductJson() {
 			fs.copyFileSync(backupPath, productJsonPath);
 			fs.unlinkSync(backupPath);
 			console.log('[Universal RTL Patcher] Restored product.json from backup and removed backup file.');
+			return { success: true, message: 'Restored product.json from backup.' };
 		} catch (err) {
 			console.error('[Universal RTL Patcher] Failed to restore product.json backup:', err);
+			return { success: false, message: `Failed to restore product.json backup: ${err.message}` };
 		}
 	} else {
 		console.log('[Universal RTL Patcher] No product.json backup found to restore.');
+		// No backup — fix checksums based on current files instead
+		return fixAllChecksums();
 	}
 }
 
@@ -136,7 +230,7 @@ function patch(config, extensionPath) {
 		}
 
 		// Read new CSS patch file
-		const cssPatchPath = path.join(extensionPath, 'inject', 'kiro-rtl.css');
+		const cssPatchPath = path.join(extensionPath, 'inject', 'chat-rtl.css');
 		const cssPatch = fs.readFileSync(cssPatchPath, 'utf8');
 
 		// Append new patch
@@ -172,9 +266,10 @@ function patch(config, extensionPath) {
 		fs.writeFileSync(jsPath, content + patchData, 'utf8');
 		console.log(`[Universal RTL Patcher] Appended JS patch to ${jsPath}`);
 
-		// Update product.json checksum for the modified JS file
-		updateChecksum('vs/workbench/workbench.desktop.main.js', jsPath);
-		return true;
+		// Fix ALL checksums in product.json so the IDE integrity check passes
+		const checksumResult = fixAllChecksums();
+		console.log(`[Universal RTL Patcher] Checksum fix result: ${checksumResult.message}`);
+		return { patched: true, checksumResult };
 	}
 	return false;
 }
@@ -214,9 +309,11 @@ function unpatch(config) {
 		fs.writeFileSync(jsPath, content.trim(), 'utf8');
 		console.log(`[Universal RTL Patcher] Removed JS patch from ${jsPath}`);
 
-		// Restore product.json from backup
+		// Restore product.json and fix all checksums
 		restoreProductJson();
-		return true;
+		const checksumResult = fixAllChecksums();
+		console.log(`[Universal RTL Patcher] Post-unpatch checksum fix: ${checksumResult.message}`);
+		return { patched: false, checksumResult };
 	}
 	return false;
 }
@@ -224,5 +321,6 @@ function unpatch(config) {
 module.exports = {
 	isPatched,
 	patch,
-	unpatch
+	unpatch,
+	fixAllChecksums
 };

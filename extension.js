@@ -31,22 +31,30 @@ function toggleRtl(extensionPath, context) {
 	}
 
 	const isEnabled = checkIsEnabled(ide);
-	let success = false;
+	let result = false;
 
 	try {
 		if (isEnabled) {
-			success = patcher.unpatch(ide);
-			if (success) {
+			result = patcher.unpatch(ide);
+			if (result) {
 				context.globalState.update('rtlEnabled', false);
 				updateStatusBar(false, ide.name);
-				promptRestart(`${ide.name} RTL Support Disabled.`);
+				const checksumInfo = result.checksumResult ? ` (Checksums: ${result.checksumResult.message})` : '';
+				promptRestart(`${ide.name} RTL Support Disabled.${checksumInfo}`);
+				if (result.checksumResult && !result.checksumResult.success) {
+					vscode.window.showWarningMessage(`RTL: Checksum fix issue — ${result.checksumResult.message}. You may see an integrity warning.`);
+				}
 			}
 		} else {
-			success = patcher.patch(ide, extensionPath);
-			if (success) {
+			result = patcher.patch(ide, extensionPath);
+			if (result) {
 				context.globalState.update('rtlEnabled', true);
 				updateStatusBar(true, ide.name);
-				promptRestart(`${ide.name} RTL Support Enabled!`);
+				const checksumInfo = result.checksumResult ? ` (Checksums: ${result.checksumResult.message})` : '';
+				promptRestart(`${ide.name} RTL Support Enabled!${checksumInfo}`);
+				if (result.checksumResult && !result.checksumResult.success) {
+					vscode.window.showWarningMessage(`RTL: Checksum fix issue — ${result.checksumResult.message}. You may see an integrity warning.`);
+				}
 			}
 		}
 	} catch (err) {
@@ -179,12 +187,13 @@ function activate(context) {
 		console.log(`[Universal RTL] Extension updated from ${lastVersion} to ${currentVersion}. Re-applying patch...`);
 		try {
 			patcher.unpatch(ide);
-			const success = patcher.patch(ide, context.extensionPath);
-			if (success) {
+			const patchResult = patcher.patch(ide, context.extensionPath);
+			if (patchResult) {
 				currentState = true;
 				repatchedOnUpdate = true;
 				context.globalState.update('extensionVersion', currentVersion);
-				promptRestart(`Universal RTL Support was updated to version ${currentVersion}.`);
+				const checksumMsg = patchResult.checksumResult ? ` ${patchResult.checksumResult.message}` : '';
+				promptRestart(`Universal RTL Support was updated to version ${currentVersion}.${checksumMsg}`);
 			}
 		} catch (err) {
 			console.error('[Universal RTL] Auto-repatch on update failed:', err);
@@ -198,14 +207,29 @@ function activate(context) {
 		if (shouldBeEnabled) {
 			console.log('[Universal RTL] Auto-repair: Patch was missing but state is enabled. Re-applying patch...');
 			try {
-				const success = patcher.patch(ide, context.extensionPath);
-				if (success) {
+				const patchResult = patcher.patch(ide, context.extensionPath);
+				if (patchResult) {
 					currentState = true;
-					promptRestart('Universal RTL Support was automatically restored after update.');
+					const checksumMsg = patchResult.checksumResult ? ` ${patchResult.checksumResult.message}` : '';
+					promptRestart(`Universal RTL Support was automatically restored after update.${checksumMsg}`);
 				}
 			} catch (err) {
 				console.error('[Universal RTL] Auto-repair failed:', err);
 			}
+		}
+	}
+
+	// Proactive checksum fix: always ensure checksums are in sync when RTL is enabled.
+	// This catches cases where the patch exists but checksums were never updated
+	// (e.g., upgraded from an older extension version that didn't fix checksums).
+	if (ide && currentState && !repatchedOnUpdate) {
+		try {
+			const checksumResult = patcher.fixAllChecksums();
+			if (checksumResult.updated > 0) {
+				console.log(`[Universal RTL] Proactive checksum fix: ${checksumResult.message}`);
+			}
+		} catch (err) {
+			console.error('[Universal RTL] Proactive checksum fix failed:', err);
 		}
 	}
 
@@ -219,10 +243,35 @@ function activate(context) {
 		vscode.window.showInformationMessage('RTL: Cleared all stored editor/preview files.');
 	});
 
+	let fixChecksumsCmd = vscode.commands.registerCommand('universal-rtl.fixChecksums', () => {
+		try {
+			const result = patcher.fixAllChecksums();
+			if (result.success) {
+				if (result.updated > 0) {
+					vscode.window.showInformationMessage(
+						`RTL: Fixed ${result.updated} of ${result.total} checksum(s). Please restart to clear the integrity warning.`,
+						'Restart Now'
+					).then(selection => {
+						if (selection === 'Restart Now') {
+							vscode.commands.executeCommand('workbench.action.reloadWindow');
+						}
+					});
+				} else {
+					vscode.window.showInformationMessage(`RTL: All checksums are already up to date. ${result.message}`);
+				}
+			} else {
+				vscode.window.showErrorMessage(`RTL: Failed to fix checksums — ${result.message}`);
+			}
+		} catch (err) {
+			vscode.window.showErrorMessage(`RTL: Checksum fix error — ${err.message}`);
+		}
+	});
+
 	context.subscriptions.push(
 		toggleCmd,
 		toggleEditorCmd,
 		clearCmd,
+		fixChecksumsCmd,
 		myStatusBarItem,
 		editorStateStatusBarItem,
 		vscode.window.onDidChangeActiveTextEditor(() => updateEditorState()),

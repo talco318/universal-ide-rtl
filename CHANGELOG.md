@@ -2,6 +2,28 @@
 
 All notable changes to the "Universal IDE RTL Support" extension will be documented in this file.
 
+## [1.3.5] - 2026-09-08
+
+### Added
+- Full RTL support for **Kiro IDE** chat interface with new selectors:
+  - `.user-message-body`, `.user-message-text` (user messages)
+  - `.agent-message`, `.kiro-streaming-text` (agent responses)
+  - `.space-y-4`, `.session-view-content` (content containers)
+  - `li.py-1`, `span.font-semibold` (list items and bold text)
+- Full RTL support for **Antigravity's latest version** chat interface.
+- Added selectors for Antigravity-specific elements: `.leading-relaxed`, `.select-text`, `.flex.flex-col`, and padding-based containers.
+- RTL support for blockquotes (border moved to right side for Hebrew/Arabic text).
+- RTL support for headings (h1-h6) in both Kiro and Antigravity.
+
+### Changed
+- Renamed `kiro-rtl.css` to `chat-rtl.css` for better generic naming.
+- Reorganized targetSelectors in JS with clear sections: Kiro, Cursor, VS Code, Antigravity.
+
+### Fixed
+- Fixed alignment issues in Kiro and Antigravity chat where Hebrew/Arabic text was not properly right-aligned.
+- Fixed list padding direction in RTL lists.
+- Ensured code blocks and inline code remain LTR inside chat bubbles.
+
 ## [1.3.3] - 2026-05-29
 
 ### Added

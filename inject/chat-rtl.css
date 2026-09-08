@@ -1,0 +1,215 @@
+/* ============================================
+   UNIVERSAL IDE RTL - CHAT SUPPORT
+   Supports: Kiro, Antigravity, VS Code Chat
+   ============================================ */
+
+/* ============================================
+   KIRO RTL SUPPORT
+   ============================================ */
+
+/* 1. User message containers */
+.user-message-body,
+.user-message-text {
+  /* Container - direction set by JS based on content */
+}
+
+/* 2. Agent message containers */
+.agent-message > .space-y-4,
+.agent-message .kiro-streaming-text {
+  /* Container - direction set by JS based on content */
+}
+
+/* 3. Text elements inside messages */
+.space-y-4 p,
+.space-y-4 li,
+.space-y-4 h1,
+.space-y-4 h2,
+.space-y-4 h3,
+.space-y-4 h4,
+.space-y-4 h5,
+.space-y-4 h6,
+.kiro-streaming-text p,
+.kiro-streaming-text li,
+.kiro-streaming-text h1,
+.kiro-streaming-text h2,
+.kiro-streaming-text h3,
+.user-message-body p,
+.user-message-body li,
+.agent-message p,
+.agent-message li,
+.agent-message span.font-semibold {
+  /* Direction set dynamically by JS */
+}
+
+/* 4. RTL-specific styles for Kiro */
+.user-message-body[style*="direction: rtl"] p,
+.agent-message[style*="direction: rtl"] p,
+.space-y-4[style*="direction: rtl"] p,
+.space-y-4[style*="direction: rtl"] li {
+  unicode-bidi: plaintext !important;
+}
+
+/* 5. Kiro lists RTL padding */
+.space-y-4 ul[style*="direction: rtl"],
+.space-y-4 ol[style*="direction: rtl"],
+.agent-message ul[style*="direction: rtl"],
+.agent-message ol[style*="direction: rtl"],
+.user-message-body ul[style*="direction: rtl"],
+.user-message-body ol[style*="direction: rtl"] {
+  padding-right: 1.5em !important;
+  padding-left: 0 !important;
+}
+
+/* 6. Kiro code blocks - always LTR */
+.space-y-4 pre,
+.space-y-4 code,
+.kiro-streaming-text pre,
+.kiro-streaming-text code,
+.agent-message pre,
+.agent-message code,
+.user-message-body pre,
+.user-message-body code {
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: isolate !important;
+}
+
+/* 7. Kiro inline code within RTL text */
+.space-y-4 p code,
+.space-y-4 li code,
+.agent-message p code,
+.agent-message li code {
+  direction: ltr !important;
+  display: inline-block !important;
+  unicode-bidi: isolate !important;
+}
+
+/* 8. Protect Kiro system UI elements */
+.agent-message-meta,
+.agent-message-avatar,
+.agent-message-role,
+.kiro-copy-message-button,
+.kiro-button,
+.session-manager-header,
+.session-manager-actions,
+.session-load-indicator,
+[class*="agent-outcome"],
+[class*="step-container"] {
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: normal !important;
+}
+
+/* ============================================
+   ANTIGRAVITY RTL SUPPORT
+   ============================================ */
+
+/* 1. Main text containers */
+.leading-relaxed p,
+.leading-relaxed li,
+.leading-relaxed h1,
+.leading-relaxed h2,
+.leading-relaxed h3,
+.leading-relaxed h4,
+.leading-relaxed h5,
+.leading-relaxed h6,
+.select-text p,
+.select-text li,
+.select-text h1,
+.select-text h2,
+.select-text h3,
+.select-text h4,
+.select-text h5,
+.select-text h6,
+.flex.flex-col p,
+.flex.flex-col li,
+.flex.flex-col h1,
+.flex.flex-col h2,
+.flex.flex-col h3 {
+  /* Direction set dynamically by JS */
+}
+
+/* 2. RTL-specific styles for Antigravity */
+.leading-relaxed p[style*="direction: rtl"],
+.leading-relaxed li[style*="direction: rtl"],
+.select-text p[style*="direction: rtl"],
+.select-text li[style*="direction: rtl"] {
+  unicode-bidi: plaintext !important;
+}
+
+/* 3. Antigravity lists RTL padding */
+.leading-relaxed ul[style*="direction: rtl"],
+.leading-relaxed ol[style*="direction: rtl"],
+.select-text ul[style*="direction: rtl"],
+.select-text ol[style*="direction: rtl"] {
+  padding-right: 1.5em !important;
+  padding-left: 0 !important;
+}
+
+/* 4. Antigravity blockquotes RTL */
+.leading-relaxed blockquote[style*="direction: rtl"],
+.select-text blockquote[style*="direction: rtl"] {
+  border-left: none !important;
+  border-right: 4px solid var(--vscode-textBlockQuote-border, rgba(128, 128, 128, 0.4)) !important;
+}
+
+/* 5. Antigravity code blocks - always LTR */
+.leading-relaxed pre,
+.leading-relaxed code,
+.select-text pre,
+.select-text code,
+.flex.flex-col pre,
+.flex.flex-col code {
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: isolate !important;
+}
+
+/* 6. Antigravity inline code */
+.leading-relaxed p code,
+.leading-relaxed li code,
+.select-text p code,
+.select-text li code {
+  direction: ltr !important;
+  display: inline-block !important;
+  unicode-bidi: isolate !important;
+}
+
+/* ============================================
+   VS CODE CHAT RTL SUPPORT (Legacy)
+   ============================================ */
+
+/* 1. Standard chat containers */
+.interactive-session p,
+.interactive-session li,
+.chat-widget p,
+.chat-widget li,
+.chat-message p,
+.chat-message li,
+.message-content p,
+.message-content li,
+#conversation p,
+#conversation li {
+  /* Direction set dynamically by JS */
+}
+
+/* 2. Chat lists RTL padding */
+.interactive-session ul[style*="direction: rtl"],
+.interactive-session ol[style*="direction: rtl"],
+.chat-widget ul[style*="direction: rtl"],
+.chat-widget ol[style*="direction: rtl"] {
+  padding-right: 1.5em !important;
+  padding-left: 0 !important;
+}
+
+/* 3. VS Code chat code blocks - always LTR */
+.interactive-session pre,
+.interactive-session code,
+.chat-widget pre,
+.chat-widget code,
+.chat-message pre,
+.chat-message code {
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: isolate !important;
+}
