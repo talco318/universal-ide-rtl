@@ -2,6 +2,20 @@
 
 All notable changes to the "Universal IDE RTL Support" extension will be documented in this file.
 
+## [1.3.6] - 2026-09-14
+
+### Fixed
+- Fixed Kiro RTL support regression from v1.3.5 where CSS selectors were removed.
+- Restored essential RTL CSS selectors for Kiro chat elements:
+  - `.session-view-content` p/li/h1-h6 selectors
+  - `.session-manager-content` selectors
+  - `#root` fallback selectors
+  - `.user-message-body` and `.agent-message` selectors
+  - `.space-y-4` and `.kiro-streaming-text` selectors
+  - Legacy `.kiro-chat-message-markdown` selectors
+- Restored proper list padding, table alignment, and code block LTR protection.
+- Restored system UI element protection (buttons, agent outcomes, etc.).
+
 ## [1.3.5] - 2026-09-08
 
 ### Added

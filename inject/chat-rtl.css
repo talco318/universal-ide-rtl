@@ -7,19 +7,66 @@
    KIRO RTL SUPPORT
    ============================================ */
 
-/* 1. User message containers */
-.user-message-body,
-.user-message-text {
-  /* Container - direction set by JS based on content */
+/* 1. Main Kiro session containers - apply RTL to free text */
+.session-view-content p,
+.session-view-content li,
+.session-view-content h1,
+.session-view-content h2,
+.session-view-content h3,
+.session-view-content h4,
+.session-view-content h5,
+.session-view-content h6,
+.session-view-content blockquote,
+.session-view-content td,
+.session-view-content th {
+  direction: rtl !important;
+  text-align: right !important;
+  unicode-bidi: plaintext !important;
 }
 
-/* 2. Agent message containers */
-.agent-message > .space-y-4,
-.agent-message .kiro-streaming-text {
-  /* Container - direction set by JS based on content */
+/* 2. Session manager content */
+.session-manager-content p,
+.session-manager-content li,
+.session-manager-content h1,
+.session-manager-content h2,
+.session-manager-content h3,
+.session-manager-content h4,
+.session-manager-content h5,
+.session-manager-content h6 {
+  direction: rtl !important;
+  text-align: right !important;
+  unicode-bidi: plaintext !important;
 }
 
-/* 3. Text elements inside messages */
+/* 3. Generic fallback - any p/li/h inside #root that isn't in code */
+#root p,
+#root li,
+#root h1,
+#root h2,
+#root h3,
+#root h4,
+#root h5,
+#root h6,
+#root blockquote {
+  direction: rtl !important;
+  text-align: right !important;
+  unicode-bidi: plaintext !important;
+}
+
+/* 4. User and agent message containers */
+.user-message-body p,
+.user-message-body li,
+.user-message-text p,
+.user-message-text li,
+.agent-message p,
+.agent-message li,
+.agent-message span.font-semibold {
+  direction: rtl !important;
+  text-align: right !important;
+  unicode-bidi: plaintext !important;
+}
+
+/* 5. Space-y-4 and streaming text containers */
 .space-y-4 p,
 .space-y-4 li,
 .space-y-4 h1,
@@ -32,35 +79,66 @@
 .kiro-streaming-text li,
 .kiro-streaming-text h1,
 .kiro-streaming-text h2,
-.kiro-streaming-text h3,
-.user-message-body p,
-.user-message-body li,
-.agent-message p,
-.agent-message li,
-.agent-message span.font-semibold {
-  /* Direction set dynamically by JS */
-}
-
-/* 4. RTL-specific styles for Kiro */
-.user-message-body[style*="direction: rtl"] p,
-.agent-message[style*="direction: rtl"] p,
-.space-y-4[style*="direction: rtl"] p,
-.space-y-4[style*="direction: rtl"] li {
+.kiro-streaming-text h3 {
+  direction: rtl !important;
+  text-align: right !important;
   unicode-bidi: plaintext !important;
 }
 
-/* 5. Kiro lists RTL padding */
-.space-y-4 ul[style*="direction: rtl"],
-.space-y-4 ol[style*="direction: rtl"],
-.agent-message ul[style*="direction: rtl"],
-.agent-message ol[style*="direction: rtl"],
-.user-message-body ul[style*="direction: rtl"],
-.user-message-body ol[style*="direction: rtl"] {
+/* 6. Legacy Kiro selectors */
+.kiro-chat-message-body > div:not([class*="agent-"]),
+.kiro-chat-message-markdown p,
+.kiro-chat-message-markdown ul,
+.kiro-chat-message-markdown ol,
+.kiro-chat-message-markdown h1,
+.kiro-chat-message-markdown h2,
+.kiro-chat-message-markdown h3,
+.kiro-chat-message-markdown h4,
+.kiro-chat-message-markdown h5,
+.kiro-chat-message-markdown h6,
+.kiro-focus-area {
+  direction: rtl !important;
+  text-align: right !important;
+  unicode-bidi: plaintext !important;
+}
+
+/* 7. Kiro lists RTL padding */
+.session-view-content ul,
+.session-view-content ol,
+.session-manager-content ul,
+.session-manager-content ol,
+#root ul,
+#root ol,
+.space-y-4 ul,
+.space-y-4 ol,
+.agent-message ul,
+.agent-message ol,
+.user-message-body ul,
+.user-message-body ol,
+.kiro-chat-message-markdown ul,
+.kiro-chat-message-markdown ol {
   padding-right: 1.5em !important;
   padding-left: 0 !important;
 }
 
-/* 6. Kiro code blocks - always LTR */
+/* 8. Kiro tables - align right for RTL */
+.session-view-content table,
+.session-manager-content table,
+#root table {
+  direction: rtl !important;
+  margin-left: auto !important;
+  margin-right: 0 !important;
+}
+
+/* 9. Kiro code blocks - always LTR */
+pre,
+code,
+pre *,
+code *,
+.kiro-inline-diff,
+.kiro-inline-diff *,
+.kiro-inline-diff-content,
+.kiro-inline-diff-content *,
 .space-y-4 pre,
 .space-y-4 code,
 .kiro-streaming-text pre,
@@ -68,23 +146,34 @@
 .agent-message pre,
 .agent-message code,
 .user-message-body pre,
-.user-message-body code {
+.user-message-body code,
+.kiro-chat-message pre,
+.kiro-chat-message code,
+.kiro-code-preview,
+pre code {
   direction: ltr !important;
   text-align: left !important;
-  unicode-bidi: isolate !important;
+  unicode-bidi: normal !important;
 }
 
-/* 7. Kiro inline code within RTL text */
+/* 10. Kiro inline code within RTL text */
+p code,
+li code,
 .space-y-4 p code,
 .space-y-4 li code,
 .agent-message p code,
-.agent-message li code {
+.agent-message li code,
+.kiro-chat-message-markdown p code,
+.kiro-chat-message-markdown li code {
   direction: ltr !important;
   display: inline-block !important;
-  unicode-bidi: isolate !important;
+  unicode-bidi: normal !important;
+  min-height: unset !important;
+  padding: 0 4px !important;
 }
 
-/* 8. Protect Kiro system UI elements */
+/* 11. Protect Kiro system UI elements - always LTR */
+button,
 .agent-message-meta,
 .agent-message-avatar,
 .agent-message-role,
@@ -94,10 +183,25 @@
 .session-manager-actions,
 .session-load-indicator,
 [class*="agent-outcome"],
-[class*="step-container"] {
+[class*="step-container"],
+.kiro-turn-usage-summary,
+.kiro-inline-diff-header,
+.kiro-inline-diff-stats,
+.kiro-command-cwd,
+.tab-bar-item,
+.session-history-item,
+.kiro-hook-card,
+.kiro-dropdown,
+.agent-outcome-summary,
+.kiro-chat-message-body button {
   direction: ltr !important;
   text-align: left !important;
   unicode-bidi: normal !important;
+}
+
+/* 12. Monaco editor view-lines in chat inputs */
+.editor-instance .view-line {
+  unicode-bidi: plaintext !important;
 }
 
 /* ============================================
