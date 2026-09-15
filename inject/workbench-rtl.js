@@ -72,6 +72,25 @@
             padding-right: 1.5em !important;
             padding-left: 0 !important;
         }
+
+        /* Antigravity User Input & Message Bubbles */
+        .whitespace-pre-wrap[dir="rtl"],
+        [class*="whitespace-pre-wrap"][dir="rtl"] {
+            direction: rtl !important;
+            text-align: right !important;
+            unicode-bidi: plaintext !important;
+        }
+
+        /* Source Control / Git Commit Editor */
+        .scm-editor textarea[dir="rtl"],
+        .scm-view textarea[dir="rtl"],
+        .scm-editor [dir="rtl"],
+        [aria-label*="Message"] textarea[dir="rtl"],
+        [aria-label*="Source Control Input"] textarea[dir="rtl"] {
+            direction: rtl !important;
+            text-align: right !important;
+            unicode-bidi: plaintext !important;
+        }
     `;
     document.head.appendChild(styleEl);
 
@@ -93,6 +112,13 @@
             line.closest('.inline-chat') ||
             line.closest('.interactive-editor') ||
             line.closest('.quick-input-widget') ||
+            // Antigravity user input step & bubbles
+            line.closest('[class*="user-input-step"]') ||
+            line.closest('.user-input-buttons-container') ||
+            // SCM / Git containers
+            line.closest('.scm-editor') ||
+            line.closest('.scm-view') ||
+            line.closest('[aria-label*="Source Control"]') ||
             // Kiro-specific containers
             line.closest('.session-view-content') ||
             line.closest('.session-manager-content') ||
@@ -340,7 +366,26 @@
         '[class*="px-"][class*="py-"] li',
         '[class*="px-"][class*="py-"] h1',
         '[class*="px-"][class*="py-"] h2',
-        '[class*="px-"][class*="py-"] h3'
+        '[class*="px-"][class*="py-"] h3',
+
+        // Antigravity user input steps & bubbles (div.whitespace-pre-wrap, bg-card, etc.)
+        '.whitespace-pre-wrap',
+        '[class*="whitespace-pre-wrap"]',
+        '[class*="user-input-step"] .whitespace-pre-wrap',
+        '[class*="user-input-step"] [class*="whitespace-pre-wrap"]',
+        '.bg-card .whitespace-pre-wrap',
+        '.bg-card [class*="whitespace-pre-wrap"]',
+        '.bg-card [class*="text-sm"]',
+
+        // ===================
+        // Source Control (Git Commit) selectors
+        // ===================
+        '.scm-editor textarea',
+        '.scm-editor [contenteditable="true"]',
+        '.scm-view textarea',
+        '[aria-label*="Message"] textarea',
+        '[aria-label*="Source Control Input"] textarea',
+        '.suggest-input-container textarea'
     ];
 
     const inputContainers = [
@@ -348,7 +393,10 @@
         '.chat-input', 
         '.chat-input-container', 
         '.composer-bar',
-        '.ui-prompt-input'
+        '.ui-prompt-input',
+        '.scm-editor',
+        '.scm-view',
+        '[class*="user-input-step"]'
     ];
 
     function enforceRTL() {
@@ -518,7 +566,10 @@
                                     activeEl.closest('.chat-input-container') ||
                                     activeEl.closest('.interactive-session') ||
                                     activeEl.closest('.composer-bar') ||
-                                    activeEl.closest('.ui-prompt-input');
+                                    activeEl.closest('.ui-prompt-input') ||
+                                    activeEl.closest('.scm-editor') ||
+                                    activeEl.closest('.scm-view') ||
+                                    activeEl.closest('[class*="user-input-step"]');
                 
                 if (isChatInput) {
                     e.preventDefault();

@@ -237,7 +237,19 @@ button,
 .leading-relaxed p[style*="direction: rtl"],
 .leading-relaxed li[style*="direction: rtl"],
 .select-text p[style*="direction: rtl"],
-.select-text li[style*="direction: rtl"] {
+.select-text li[style*="direction: rtl"],
+.whitespace-pre-wrap[dir="rtl"],
+[class*="whitespace-pre-wrap"][dir="rtl"],
+.scm-editor textarea[dir="rtl"],
+.scm-view textarea[dir="rtl"] {
+  unicode-bidi: plaintext !important;
+}
+
+/* Antigravity user prompt card */
+.whitespace-pre-wrap[dir="rtl"],
+[class*="whitespace-pre-wrap"][dir="rtl"] {
+  direction: rtl !important;
+  text-align: right !important;
   unicode-bidi: plaintext !important;
 }
 
