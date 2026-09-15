@@ -30,11 +30,15 @@
     "source-control",
     "antigravity",
     "cursor",
+    "cursor-ai",
     "windsurf",
     "kiro",
     "chat",
     "ai-chat",
+    "copilot",
+    "vscode",
     "bidi",
+    "bidirectional",
     "markdown",
     "he",
     "ar",
@@ -80,6 +84,11 @@
       {
         "command": "universal-rtl.fixChecksums",
         "title": "RTL: Fix IDE Checksums",
+        "category": "Universal RTL"
+      },
+      {
+        "command": "universal-rtl.openReview",
+        "title": "RTL: Rate & Review on Open VSX (5 Stars)",
         "category": "Universal RTL"
       }
     ],

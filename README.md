@@ -1,5 +1,8 @@
 # Universal IDE RTL Support 🌐
 
+[![Open VSX Version](https://img.shields.io/open-vsx/v/talco/universal-ide-rtl?style=flat-square&color=blue&label=Open%20VSX)](https://open-vsx.org/extension/talco/universal-ide-rtl)
+[![Open VSX Downloads](https://img.shields.io/open-vsx/dt/talco/universal-ide-rtl?style=flat-square&color=brightgreen&label=Downloads)](https://open-vsx.org/extension/talco/universal-ide-rtl)
+[![Open VSX Rating](https://img.shields.io/open-vsx/rating/talco/universal-ide-rtl?style=flat-square&color=yellow&label=Rating)](https://open-vsx.org/extension/talco/universal-ide-rtl#review-details)
 [![License](https://img.shields.io/github/license/talco318/universal-ide-rtl?style=flat-square&color=green)](LICENSE)
 [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-black?style=flat-square&logo=github)](https://github.com/talco318/universal-ide-rtl)
 
@@ -7,7 +10,7 @@ A unified extension that adds Right-to-Left (RTL) text support for **Hebrew** an
 
 One extension. All IDEs. Zero hassle.
 
-![Universal IDE RTL Before and After](media/before-after.svg)
+![Universal IDE RTL Before and After](media/before-after.png)
 
 > [!IMPORTANT]
 > **⚡ Quick Activation / הנחיות הפעלה מהירה / تعليمات التفعيل السريع ⚡**
@@ -121,6 +124,14 @@ The extension uses two patching strategies depending on the IDE architecture:
 
 - Kiro: Patches `extensions/kiro.kiro-agent/packages/continuedev/gui/dist/assets/index.css`
 - Antigravity/Cursor/Windsurf: Patches `out/vs/workbench/workbench.desktop.main.js`
+
+---
+
+## ⭐ Support & Reviews
+
+If Universal IDE RTL improves your daily coding workflow, please take 30 seconds to **[⭐ Leave a 5-Star Review on Open VSX](https://open-vsx.org/extension/talco/universal-ide-rtl#review-details)**! 
+
+Your reviews help more developers in the Hebrew, Arabic, and Persian developer communities discover this extension.
 
 ---
 

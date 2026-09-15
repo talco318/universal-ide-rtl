@@ -292,11 +292,16 @@ function activate(context) {
 		}
 	});
 
+	let openReviewCmd = vscode.commands.registerCommand('universal-rtl.openReview', () => {
+		vscode.env.openExternal(vscode.Uri.parse('https://open-vsx.org/extension/talco/universal-ide-rtl#review-details'));
+	});
+
 	context.subscriptions.push(
 		toggleCmd,
 		toggleEditorCmd,
 		clearCmd,
 		fixChecksumsCmd,
+		openReviewCmd,
 		myStatusBarItem,
 		editorStateStatusBarItem,
 		vscode.window.onDidChangeActiveTextEditor(() => updateEditorState()),
