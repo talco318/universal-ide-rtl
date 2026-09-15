@@ -235,6 +235,31 @@ function activate(context) {
 
 	updateStatusBar(currentState, ide?.name);
 
+	// 1-Click Onboarding Welcome Notification:
+	// If the extension is freshly installed or RTL is not yet enabled, prompt user once with 1-click Enable & Reload
+	const hasPromptedWelcome = context.globalState.get('hasPromptedWelcome', false);
+	if (ide && !currentState && !hasPromptedWelcome) {
+		context.globalState.update('hasPromptedWelcome', true);
+		vscode.window.showInformationMessage(
+			`🌐 Universal IDE RTL Support: Welcome! Enable Right-to-Left (Hebrew/Arabic) formatting for AI Chat & Git now?`,
+			'Enable & Reload',
+			'Later'
+		).then(selection => {
+			if (selection === 'Enable & Reload') {
+				try {
+					const patchResult = patcher.patch(ide, context.extensionPath);
+					if (patchResult) {
+						context.globalState.update('rtlEnabled', true);
+						updateStatusBar(true, ide.name);
+						vscode.commands.executeCommand('workbench.action.reloadWindow');
+					}
+				} catch (err) {
+					vscode.window.showErrorMessage(`RTL: Failed to enable - ${err.message}`);
+				}
+			}
+		});
+	}
+
 	let clearCmd = vscode.commands.registerCommand('universal-rtl.clearAllEditorRtl', () => {
 		activeRtlFiles.clear();
 		context.workspaceState.update('activeRtlFiles', []);
