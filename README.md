@@ -3,23 +3,26 @@
 [![License](https://img.shields.io/github/license/talco318/universal-ide-rtl?style=flat-square&color=green)](LICENSE)
 [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-black?style=flat-square&logo=github)](https://github.com/talco318/universal-ide-rtl)
 
-A unified extension that adds Right-to-Left (RTL) text support for **Hebrew** and **Arabic** across multiple AI-powered IDEs.
+A unified extension that adds Right-to-Left (RTL) text support for **Hebrew** and **Arabic** across multiple AI-powered IDEs (Antigravity, Cursor, Windsurf, Kiro, VS Code) and Source Control Git commits.
 
 One extension. All IDEs. Zero hassle.
 
+![Universal IDE RTL Before and After](media/before-after.svg)
 
 > [!IMPORTANT]
-> **⚠️ Action Required After Installation / חובה לבצע לאחר ההתקנה! ⚠️**
+> **⚡ Quick Activation / הנחיות הפעלה מהירה / تعليمات التفعيل السريع ⚡**
 >
 > **English:** 
-> After installing, the RTL support is **disabled by default**. You **must** manually activate it:
-> 1. Click on **`RTL: OFF`** in the status bar (bottom-right corner) OR press **`Ctrl+Alt+R`** (Mac: `Cmd+Alt+R`) to toggle it.
-> 2. Click **Restart Now** when prompted to reload the window.
+> - 💡 **1-Click Welcome Prompt:** Upon installation, a notification appears offering **"Enable & Reload"** to activate RTL instantly with zero hassle!
+> - **Manual Activation:** Click on **`RTL: OFF`** in the status bar (bottom-right corner) OR press **`Ctrl+Alt+R`** (Mac: `Cmd+Alt+R`) to toggle it, then click **Restart Now**.
 >
 > **עברית:**
-> לאחר התקנת התוסף, התמיכה ב-RTL **כבויה כברירת מחדל**. **חובה** להפעיל אותה באופן ידני כדי שהיישור לימין יעבוד:
-> 1. לחץ על כפתור **`RTL: OFF`** בשורת הסטטוס למטה מימין, או לחץ על קיצור המקלדת **`Ctrl+Alt+R`** כדי להפעיל.
-> 2. לחץ על כפתור **Restart Now** בהודעה שתקפוץ כדי לטעון מחדש את חלון העורך ולהחיל את היישור!
+> - 💡 **הפעלה מהירה בלחיצה אחת:** מיד לאחר ההתקנה תקפוץ הודעת ברוכים הבאים עם כפתור **"Enable & Reload"** להפעלה מיידית!
+> - **הפעלה ידנית:** לחץ על כפתור **`RTL: OFF`** בשורת הסטטוס למטה מימין, או לחץ על קיצור המקלדת **`Ctrl+Alt+R`**, ולאחר מכן לחץ על **Restart Now**.
+>
+> **العربية:**
+> - 💡 **تفعيل فوري بنقرة واحدة:** بمجرد تثبيت الإضافة، يظهر إشعار ترحيبي يتيح لك النقر على **"Enable & Reload"** لتفعيل محاذاة RTL مباشرة!
+> - **التفعيل اليدوي:** انقر على **`RTL: OFF`** في شريط الحالة (الزاوية السفلية) أو اضغط على **`Ctrl+Alt+R`** (لنظام Mac: `Cmd+Alt+R`) للتبديل، ثم انقر على **Restart Now**.
 
 ---
 
@@ -27,10 +30,10 @@ One extension. All IDEs. Zero hassle.
 
 | IDE | Method | Status |
 |-----|--------|--------|
-| **Kiro** | CSS Patch (webview) | ✅ Tested |
-| **Antigravity** | JS Injection (workbench) | ✅ Tested |
+| **Antigravity** | JS Injection (workbench) | ✅ Tested (Chat & User Bubbles) |
+| **Cursor** | JS Injection (workbench) | ✅ Tested (Chat & Composer) |
 | **VS Code (Copilot Chat)** | JS Injection (workbench) | ✅ Tested |
-| **Cursor** | JS Injection (workbench) | ✅ Tested |
+| **Kiro** | CSS Patch (webview) | ✅ Tested |
 | **Windsurf** | JS Injection (workbench) | 🧪 Experimental |
 
 ---
@@ -38,21 +41,31 @@ One extension. All IDEs. Zero hassle.
 ## Key Features
 
 - 🌐 **Auto-Detection:** Automatically detects which IDE is running and applies the correct patching method.
-- 🧠 **Smart Formatting:** RTL for Hebrew/Arabic text, LTR preserved for code blocks, buttons, and system UI.
+- 🚀 **1-Click Welcome Activation:** Convenient prompt upon installation to enable and reload immediately.
+- 🧠 **Smart Formatting:** RTL for Hebrew & Arabic text, LTR preserved for code blocks, inline code, buttons, and system UI.
+- 🌿 **Git Commit & Source Control RTL:** Right-aligns commit messages in the Source Control panel with proper mixed English/Hebrew BiDi handling.
+- 💬 **Antigravity & AI Chat Optimized:** Seamlessly formats user prompt bubbles, assistant responses, markdown tables, and blockquotes.
 - ⚡ **One-Click Toggle:** Enable/disable via Status Bar or Command Palette.
 - 🎹 **Keyboard Shortcut:** Toggle RTL status quickly using `Ctrl+Alt+R` (Mac: `Cmd+Alt+R`).
 - 🔧 **Auto-Repair:** Automatically restores the RTL patch after IDE updates on startup.
 - 🔌 **Extensible:** Add new IDEs by simply adding an entry to `ide-configs.js`.
-- 💾 **Safe:** Creates backups before patching, clean removal on disable.
+- 💾 **Safe:** Creates backups before patching, clean removal on disable, and fixes product integrity checksums automatically.
 
 ---
 
 ## Usage
 
 1. Install the extension in your IDE.
-2. Click **RTL: OFF** in the Status Bar (bottom right) to enable.
-3. Or use Command Palette: `RTL: Toggle Status`
-4. Click **Restart Now** when prompted.
+2. Click **Enable & Reload** on the welcome notification (or click **RTL: OFF** in the Status Bar).
+3. Click **Restart Now** when prompted.
+
+---
+
+## Source Control & Git Commit Message Alignment 🌿
+
+Writing commit messages in Hebrew or Arabic?
+- The extension automatically detects RTL text in the **Source Control (SCM) commit box**.
+- Keeps issue numbers (e.g., `#42`), tags (`feat:`, `fix:`), and English branch names correctly positioned without punctuation jumping to the wrong side.
 
 ---
 

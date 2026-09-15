@@ -2,6 +2,18 @@
 
 All notable changes to the "Universal IDE RTL Support" extension will be documented in this file.
 
+## [1.3.7] - 2026-09-15
+
+### Added
+- **1-Click Onboarding Welcome Notification**: Added quick-activation welcome prompt on installation with instant `Enable & Reload` action to eliminate onboarding friction.
+- **Git Commit & Source Control RTL Support**: Added automatic Right-to-Left alignment for Hebrew and Arabic text in the Source Control (SCM) commit message box (`.scm-editor`, `.scm-view`, etc.).
+- **Arabic Language Support & Localization**: Added full Arabic keywords to `package.json` and a dedicated Arabic quick-start section in `README.md`.
+- **Before / After Visual Demo**: Added crisp Dark Mode comparison graphic (`media/before-after.svg`) to showcase the RTL transformation in `README.md`.
+
+### Fixed
+- **Antigravity User Message Bubbles**: Fixed alignment bug in Antigravity where user input prompts (`.whitespace-pre-wrap` in `[class*="user-input-step"]` and `.bg-card`) were rendered left-aligned with reversed punctuation when mixing Hebrew and English text.
+- Enhanced `shouldAlwaysEnableRtl` and `targetSelectors` to cover `.whitespace-pre-wrap` and SCM containers.
+
 ## [1.3.6] - 2026-09-14
 
 ### Fixed

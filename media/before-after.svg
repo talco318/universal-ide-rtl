@@ -1,0 +1,139 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 480" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradients -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f1117" />
+      <stop offset="100%" stop-color="#181a24" />
+    </linearGradient>
+    <linearGradient id="cardGradBefore" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1e1e24" />
+      <stop offset="100%" stop-color="#16161c" />
+    </linearGradient>
+    <linearGradient id="cardGradAfter" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#19232f" />
+      <stop offset="100%" stop-color="#131922" />
+    </linearGradient>
+    <linearGradient id="glowAfter" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.3" />
+      <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.1" />
+    </linearGradient>
+    <filter id="dropShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+
+  <style>
+    .title-main { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 24px; font-weight: 700; fill: #f1f5f9; }
+    .subtitle { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 13px; fill: #94a3b8; }
+    .panel-title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 14px; font-weight: 600; }
+    .chat-text { font-family: "Segoe UI", Tahoma, Arial, sans-serif; font-size: 13px; line-height: 1.6; }
+    .code-text { font-family: "Consolas", "Courier New", monospace; font-size: 12px; }
+    .badge-text { font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-size: 11px; font-weight: 600; }
+  </style>
+
+  <!-- Outer Canvas -->
+  <rect width="1000" height="480" rx="16" fill="url(#bgGrad)" />
+  <rect width="998" height="478" x="1" y="1" rx="15" fill="none" stroke="#334155" stroke-opacity="0.4" stroke-width="1.5" />
+
+  <!-- Header Section -->
+  <g transform="translate(40, 42)">
+    <text x="0" y="0" class="title-main">Universal IDE RTL Support</text>
+    <text x="0" y="22" class="subtitle">AI Chat &amp; Git Commit RTL Formatting for Hebrew and Arabic (Antigravity, Cursor, Windsurf, Kiro, VS Code)</text>
+  </g>
+
+  <!-- ==================== LEFT PANEL: BEFORE ==================== -->
+  <g transform="translate(40, 95)" filter="url(#dropShadow)">
+    <!-- Card Frame -->
+    <rect width="440" height="340" rx="10" fill="url(#cardGradBefore)" stroke="#ef4444" stroke-opacity="0.4" stroke-width="1.5" />
+    
+    <!-- Title Bar -->
+    <rect width="440" height="38" rx="10" fill="#262630" />
+    <circle cx="20" cy="19" r="5" fill="#ef4444" />
+    <circle cx="36" cy="19" r="5" fill="#eab308" />
+    <circle cx="52" cy="19" r="5" fill="#22c55e" />
+    <text x="75" y="24" class="panel-title" fill="#f87171">❌ Before: Without Universal RTL (Default LTR)</text>
+
+    <!-- Chat Area Content -->
+    <!-- User Bubble (Left Aligned & Broken Punctuation) -->
+    <rect x="20" y="55" width="400" height="60" rx="8" fill="#2d3139" />
+    <text x="35" y="80" class="chat-text" fill="#cbd5e1" text-anchor="start">
+      .היי, יש שגיאה בקוד בבדיקת חישוב המס
+    </text>
+    <text x="35" y="100" class="chat-text" fill="#94a3b8" text-anchor="start">
+      תוכל לעזור לי לתקן את הפונקציה (calculateTotal)?
+    </text>
+
+    <!-- AI Response Bubble (Left Aligned, Mismatched Code & Flipped Syntax) -->
+    <rect x="20" y="125" width="400" height="190" rx="8" fill="#22252c" stroke="#333742" stroke-width="1" />
+    
+    <text x="35" y="150" class="chat-text" fill="#e2e8f0" text-anchor="start">
+      :בטח! הנה התיקון עבור הפונקציה שלך
+    </text>
+
+    <!-- Code Block in Before -->
+    <rect x="35" y="165" width="370" height="65" rx="6" fill="#15171c" stroke="#2d3139" stroke-width="1" />
+    <text x="48" y="188" class="code-text" fill="#4ec9b0">function <tspan fill="#dcdcaa">calculateTotal</tspan>(<tspan fill="#9cdcfe">price</tspan>, <tspan fill="#9cdcfe">tax</tspan>) {</text>
+    <text x="64" y="206" class="code-text" fill="#c586c0">return <tspan fill="#9cdcfe">price</tspan> * (1 + <tspan fill="#9cdcfe">tax</tspan>);</text>
+    <text x="48" y="222" class="code-text" fill="#d4d4d4">}</text>
+
+    <!-- Broken Bullet Points -->
+    <text x="35" y="255" class="chat-text" fill="#e2e8f0" text-anchor="start">
+      1. .הוספנו בדיקה שהערכים אינם שליליים
+    </text>
+    <text x="35" y="278" class="chat-text" fill="#e2e8f0" text-anchor="start">
+      2. .שמרנו על LTR בקוד ו-RTL התהפך שמאלה
+    </text>
+    
+    <!-- Warning Tag -->
+    <rect x="280" y="288" width="125" height="20" rx="4" fill="#7f1d1d" fill-opacity="0.6" />
+    <text x="342" y="302" class="badge-text" fill="#fca5a5" text-anchor="middle">⚠️ Broken Alignment</text>
+  </g>
+
+  <!-- ==================== RIGHT PANEL: AFTER ==================== -->
+  <g transform="translate(520, 95)" filter="url(#dropShadow)">
+    <!-- Card Frame -->
+    <rect width="440" height="340" rx="10" fill="url(#cardGradAfter)" stroke="#38bdf8" stroke-opacity="0.7" stroke-width="1.5" />
+    
+    <!-- Title Bar -->
+    <rect width="440" height="38" rx="10" fill="#1e293b" />
+    <circle cx="20" cy="19" r="5" fill="#ef4444" />
+    <circle cx="36" cy="19" r="5" fill="#eab308" />
+    <circle cx="52" cy="19" r="5" fill="#22c55e" />
+    <text x="75" y="24" class="panel-title" fill="#38bdf8">✨ After: With Universal RTL (Clean RTL + Isolated LTR)</text>
+
+    <!-- Chat Area Content -->
+    <!-- User Bubble (Right Aligned & Natural Reading Direction) -->
+    <rect x="20" y="55" width="400" height="60" rx="8" fill="#1e3a5f" stroke="#2563eb" stroke-opacity="0.3" />
+    <text x="405" y="80" class="chat-text" fill="#f8fafc" text-anchor="start" direction="rtl">
+      היי, יש שגיאה בקוד בבדיקת חישוב המס.
+    </text>
+    <text x="405" y="100" class="chat-text" fill="#93c5fd" text-anchor="start" direction="rtl">
+      תוכל לעזור לי לתקן את הפונקציה (calculateTotal)?
+    </text>
+
+    <!-- AI Response Bubble (Right Aligned, Perfect Punctuation) -->
+    <rect x="20" y="125" width="400" height="190" rx="8" fill="#0f172a" stroke="#1e293b" stroke-width="1" />
+    
+    <text x="405" y="150" class="chat-text" fill="#f1f5f9" text-anchor="start" direction="rtl">
+      בטח! הנה התיקון המושלם עבור הפונקציה שלך:
+    </text>
+
+    <!-- Code Block in After (Pure LTR preserved) -->
+    <rect x="35" y="165" width="370" height="65" rx="6" fill="#0b1120" stroke="#1e293b" stroke-width="1" />
+    <text x="48" y="188" class="code-text" fill="#4ec9b0">function <tspan fill="#dcdcaa">calculateTotal</tspan>(<tspan fill="#9cdcfe">price</tspan>, <tspan fill="#9cdcfe">tax</tspan>) {</text>
+    <text x="64" y="206" class="code-text" fill="#c586c0">return <tspan fill="#9cdcfe">price</tspan> * (1 + <tspan fill="#9cdcfe">tax</tspan>);</text>
+    <text x="48" y="222" class="code-text" fill="#d4d4d4">}</text>
+
+    <!-- Perfectly Aligned RTL Bullet Points -->
+    <text x="405" y="255" class="chat-text" fill="#f1f5f9" text-anchor="start" direction="rtl">
+      1. הוספנו בדיקה תקינה שהערכים אינם שליליים.
+    </text>
+    <text x="405" y="278" class="chat-text" fill="#f1f5f9" text-anchor="start" direction="rtl">
+      2. קוד ה-LTR מבודד לחלוטין וסימני הפיסוק במקומם!
+    </text>
+
+    <!-- Success Tag -->
+    <rect x="35" y="288" width="135" height="20" rx="4" fill="#065f46" fill-opacity="0.8" />
+    <text x="102" y="302" class="badge-text" fill="#6ee7b7" text-anchor="middle">✓ Perfect RTL &amp; Git</text>
+  </g>
+</svg>
