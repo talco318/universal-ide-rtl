@@ -1,9 +1,9 @@
 {
   "name": "universal-ide-rtl",
   "displayName": "Universal IDE RTL Support",
-  "description": "Enables proper Right-to-Left (RTL) text rendering for Hebrew and Arabic in AI Chat across multiple IDEs (Antigravity, Cursor, Windsurf, Kiro, VS Code) and Git Commit messages.",
+  "description": "Enables proper Right-to-Left (RTL & BiDi) text rendering for Hebrew, Arabic & Persian in AI Chat across IDEs (Antigravity, Cursor, Windsurf, Kiro, VS Code) and Git Commits.",
   "publisher": "talco",
-  "version": "1.3.7",
+  "version": "1.3.8",
   "icon": "icon.png",
   "license": "MIT",
   "engines": {
@@ -13,6 +13,7 @@
     "ui"
   ],
   "categories": [
+    "Programming Languages",
     "Formatters",
     "Other"
   ],
@@ -21,28 +22,26 @@
     "hebrew",
     "arabic",
     "right-to-left",
-    "عربي",
-    "العربية",
-    "עברית",
+    "bidi",
+    "bidirectional",
+    "ivrit",
+    "arabi",
     "farsi",
     "persian",
-    "git-commit",
-    "source-control",
-    "antigravity",
+    "hebrew-rtl",
+    "arabic-rtl",
     "cursor",
     "cursor-ai",
     "windsurf",
+    "antigravity",
     "kiro",
-    "chat",
     "ai-chat",
     "copilot",
-    "vscode",
-    "bidi",
-    "bidirectional",
-    "markdown",
-    "he",
-    "ar",
-    "universal"
+    "chat",
+    "git-commit",
+    "source-control",
+    "markdown-rtl",
+    "vscode"
   ],
   "activationEvents": [
     "*"
@@ -56,6 +55,11 @@
     "url": "https://github.com/talco318/universal-ide-rtl/issues"
   },
   "homepage": "https://github.com/talco318/universal-ide-rtl#readme",
+  "scripts": {
+    "growth:stats": "node scripts/track-growth.js",
+    "package": "npx @vscode/vsce package --allow-star-activation",
+    "release": "node create-release.js"
+  },
   "contributes": {
     "markdown.markdownItPlugins": true,
     "markdown.previewStyles": [
@@ -90,6 +94,11 @@
         "command": "universal-rtl.openReview",
         "title": "RTL: Rate & Review on Open VSX (5 Stars)",
         "category": "Universal RTL"
+      },
+      {
+        "command": "universal-rtl.share",
+        "title": "RTL: Share Universal IDE RTL Extension",
+        "category": "Universal RTL"
       }
     ],
     "keybindings": [
@@ -114,3 +123,4 @@
     "@types/node": "16.x"
   }
 }
+

@@ -1,7 +1,11 @@
 .env
 node_modules/
+*.vsix
 RELEASE_GUIDE.md
 create-release.js
 
 # Antigravity TimeMachine Micro-History
 .antigravity/
+
+# Internal growth documents
+GROWTH_*.md

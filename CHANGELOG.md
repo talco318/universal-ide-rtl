@@ -2,6 +2,14 @@
 
 All notable changes to the "Universal IDE RTL Support" extension will be documented in this file.
 
+## [1.3.8] - 2026-09-16
+
+### Added
+- **Viral Growth & Review Promoter**: Intelligent, non-intrusive prompter after active sessions to encourage 5-star Open VSX reviews and community sharing.
+- **One-Click Share Command**: Added `universal-rtl.share` command (`RTL: Share Universal IDE RTL Extension`) that formats and copies a quick recommendation link to clipboard.
+- **Open VSX Store Search & SEO Enhancement**: Fixed keyword encoding issues in extension tags and enriched indexing keywords (`ivrit`, `arabi`, `farsi`, `persian`, `bidi`, `hebrew-rtl`, `arabic-rtl`, `programming-languages`).
+- **Real-Time Growth & Analytics Suite**: Added automated CLI analytics tracker (`npm run growth:stats`) and automated GitHub Actions workflow to monitor download velocity and rating milestones.
+
 ## [1.3.7] - 2026-09-15
 
 ### Added

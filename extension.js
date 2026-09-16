@@ -260,6 +260,29 @@ function activate(context) {
 		});
 	}
 
+	// Viral Review & Growth Prompt:
+	// If RTL is active for at least 3 distinct sessions, prompt user once to rate or share
+	if (ide && currentState) {
+		const currentSessions = (context.globalState.get('activeSessionCount', 0)) + 1;
+		context.globalState.update('activeSessionCount', currentSessions);
+		const hasPromptedRating = context.globalState.get('hasPromptedRating', false);
+		if (currentSessions >= 3 && !hasPromptedRating) {
+			context.globalState.update('hasPromptedRating', true);
+			vscode.window.showInformationMessage(
+				`⭐ Enjoying Hebrew & Arabic RTL in ${ide.name}? A quick 5-star review helps developers find this!`,
+				'⭐ Rate 5 Stars',
+				'📢 Share',
+				'Later'
+			).then(selection => {
+				if (selection === '⭐ Rate 5 Stars') {
+					vscode.env.openExternal(vscode.Uri.parse('https://open-vsx.org/extension/talco/universal-ide-rtl#review-details'));
+				} else if (selection === '📢 Share') {
+					vscode.commands.executeCommand('universal-rtl.share');
+				}
+			});
+		}
+	}
+
 	let clearCmd = vscode.commands.registerCommand('universal-rtl.clearAllEditorRtl', () => {
 		activeRtlFiles.clear();
 		context.workspaceState.update('activeRtlFiles', []);
@@ -296,12 +319,19 @@ function activate(context) {
 		vscode.env.openExternal(vscode.Uri.parse('https://open-vsx.org/extension/talco/universal-ide-rtl#review-details'));
 	});
 
+	let shareCmd = vscode.commands.registerCommand('universal-rtl.share', async () => {
+		const shareText = `Check out Universal IDE RTL Support: https://open-vsx.org/extension/talco/universal-ide-rtl\nAdds Hebrew & Arabic RTL alignment in AI Chat (Cursor, Windsurf, Antigravity, VS Code) and Git commit messages.`;
+		await vscode.env.clipboard.writeText(shareText);
+		vscode.window.showInformationMessage('📋 Extension link copied to clipboard! Share it with fellow developers.');
+	});
+
 	context.subscriptions.push(
 		toggleCmd,
 		toggleEditorCmd,
 		clearCmd,
 		fixChecksumsCmd,
 		openReviewCmd,
+		shareCmd,
 		myStatusBarItem,
 		editorStateStatusBarItem,
 		vscode.window.onDidChangeActiveTextEditor(() => updateEditorState()),

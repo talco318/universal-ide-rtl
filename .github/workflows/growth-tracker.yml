@@ -1,0 +1,21 @@
+name: Open VSX Growth Monitor & Analytics
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Run daily at midnight UTC
+  workflow_dispatch: # Allow manual trigger from GitHub Actions tab
+
+jobs:
+  track-growth:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Fetch Open VSX Growth Analytics
+        run: node scripts/track-growth.js

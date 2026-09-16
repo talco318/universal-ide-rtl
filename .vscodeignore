@@ -2,8 +2,15 @@
 *.vsix
 .git/**
 .vscode/**
+.antigravity/**
+.github/**
+marketing/**
+growth/**
+scripts/**
 node_modules/**
 test-hebrew.md
 .gitignore
 package-lock.json
 create-release.js
+GROWTH_*.md
+
