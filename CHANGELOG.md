@@ -2,6 +2,17 @@
 
 All notable changes to the "Universal IDE RTL Support" extension will be documented in this file.
 
+## [1.3.9] - 2026-09-16
+
+### Added
+- **Claude Code RTL & BiDi Support**: Added comprehensive Right-to-Left text support for the official "Claude Code for VS Code" (`anthropic.claude-code`) extension across all supported IDEs (VS Code, Cursor, Antigravity, Kiro)!
+  - Smart auto-detection of Hebrew, Arabic, and Persian natural language text in both user prompts and assistant replies.
+  - Strict Left-to-Right (LTR) protection for code blocks, diffs, terminal outputs, thinking containers, and tools.
+  - Dedicated interactive `⇄` toggle button embedded directly into Claude Code's chat interface.
+  - Support for Claude Code Plan Preview webview RTL alignment.
+  - New dedicated commands: `RTL: Patch Claude Code Extension`, `RTL: Unpatch Claude Code Extension`, `RTL: Check Claude Code RTL Status`.
+- **100% Backwards Compatibility & Safety**: All existing IDE architectures (Antigravity, Cursor, Windsurf, Kiro, VS Code) remain completely untouched and preserved.
+
 ## [1.3.8] - 2026-09-16
 
 ### Added

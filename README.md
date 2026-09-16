@@ -29,13 +29,14 @@ One extension. All IDEs. Zero hassle.
 
 ---
 
-## Supported IDEs
+## Supported IDEs & AI Assistants
 
-| IDE | Method | Status |
-|-----|--------|--------|
+| IDE / Assistant | Method | Status |
+|---|---|---|
 | **Antigravity** | JS Injection (workbench) | ✅ Tested (Chat & User Bubbles) |
 | **Cursor** | JS Injection (workbench) | ✅ Tested (Chat & Composer) |
 | **VS Code (Copilot Chat)** | JS Injection (workbench) | ✅ Tested |
+| **Claude Code** (`anthropic.claude-code`) | Webview CSS & JS Injection | ✅ Tested (Chat, Plan & Header Toggle) |
 | **Kiro** | CSS Patch (webview) | ✅ Tested |
 | **Windsurf** | JS Injection (workbench) | 🧪 Experimental |
 
@@ -44,8 +45,9 @@ One extension. All IDEs. Zero hassle.
 ## Key Features
 
 - 🌐 **Auto-Detection:** Automatically detects which IDE is running and applies the correct patching method.
+- 🤖 **Claude Code Support:** Full Right-to-Left formatting for the official Anthropic Claude Code extension with dedicated chat toggle button.
 - 🚀 **1-Click Welcome Activation:** Convenient prompt upon installation to enable and reload immediately.
-- 🧠 **Smart Formatting:** RTL for Hebrew & Arabic text, LTR preserved for code blocks, inline code, buttons, and system UI.
+- 🧠 **Smart Formatting:** RTL for Hebrew, Arabic & Persian text, LTR preserved for code blocks, inline code, diffs, buttons, and system UI.
 - 🌿 **Git Commit & Source Control RTL:** Right-aligns commit messages in the Source Control panel with proper mixed English/Hebrew BiDi handling.
 - 💬 **Antigravity & AI Chat Optimized:** Seamlessly formats user prompt bubbles, assistant responses, markdown tables, and blockquotes.
 - ⚡ **One-Click Toggle:** Enable/disable via Status Bar or Command Palette.
@@ -78,6 +80,18 @@ The extension includes dedicated support for aligning text dynamically in the **
 - 🎛️ **Toolbar Button:** When editing a `.md` file or viewing a Markdown Preview, a small align-right icon appears in the editor title bar (top right).
 - 🔄 **Independent Toggle:** Click the toolbar button (or press `Ctrl+Alt+R` / `Cmd+Alt+R`) to toggle RTL for that specific file. It will align Hebrew/Arabic lines in the source editor and render the markdown preview right-aligned.
 - 🧹 **Reset All Files:** Run the command `RTL: Clear All RTL Editor/Preview Files` from the Command Palette to reset all stored file alignments.
+
+## Claude Code RTL Support 🤖
+
+The extension includes built-in support for Anthropic's **Claude Code for VS Code** (`anthropic.claude-code`) extension across VS Code, Cursor, Antigravity, and Kiro:
+- ⚡ **Seamless Auto-Detection:** Automatically scans chat bubbles for Hebrew, Arabic, or Persian text and formats them in RTL with zero configuration.
+- 🛡️ **Strict LTR Protection:** Code blocks, diff editors, terminal commands, tool executions, and thinking blocks are strictly protected in LTR.
+- 🎛️ **Header Toggle Button:** Injects a dedicated `⇄` button directly into Claude Code's chat header for quick manual toggling.
+- 📋 **Plan Preview RTL:** Supports Right-to-Left alignment inside Claude Code Plan Previews.
+- ⌨️ **Commands:**
+  - `RTL: Patch Claude Code Extension` (`universal-rtl.patchClaudeCode`)
+  - `RTL: Unpatch Claude Code Extension` (`universal-rtl.unpatchClaudeCode`)
+  - `RTL: Check Claude Code RTL Status` (`universal-rtl.checkClaudeCodeStatus`)
 
 ---
 
@@ -129,7 +143,7 @@ The extension uses two patching strategies depending on the IDE architecture:
 
 ## ⭐ Support & Reviews
 
-If Universal IDE RTL improves your daily coding workflow, please take 30 seconds to **[⭐ Leave a 5-Star Review on Open VSX](https://open-vsx.org/extension/talco/universal-ide-rtl#review-details)**! 
+If Universal IDE RTL improves your daily coding workflow, please take 30 seconds to **[⭐ Leave a 5-Star Review on Open VSX](https://open-vsx.org/extension/talco/universal-ide-rtl/reviews)**! 
 
 Your reviews help more developers in the Hebrew, Arabic, and Persian developer communities discover this extension.
 

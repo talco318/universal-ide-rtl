@@ -18,6 +18,8 @@ function detectIDE() {
 	return null;
 }
 
+const claudeCodePatcher = require('./claude-code-patcher');
+
 function checkIsEnabled(ide) {
 	if (!ide) return false;
 	return patcher.isPatched(ide);
@@ -36,6 +38,12 @@ function toggleRtl(extensionPath, context) {
 	try {
 		if (isEnabled) {
 			result = patcher.unpatch(ide);
+			try {
+				claudeCodePatcher.unpatchAll();
+			} catch (e) {
+				console.error('[Universal RTL] Claude Code unpatch error:', e);
+			}
+
 			if (result) {
 				context.globalState.update('rtlEnabled', false);
 				updateStatusBar(false, ide.name);
@@ -47,11 +55,21 @@ function toggleRtl(extensionPath, context) {
 			}
 		} else {
 			result = patcher.patch(ide, extensionPath);
+			let claudeInfo = '';
+			try {
+				const claudeRes = claudeCodePatcher.patchAll();
+				if (claudeRes.count > 0) {
+					claudeInfo = ` (+ ${claudeRes.count} Claude Code installation(s) patched)`;
+				}
+			} catch (e) {
+				console.error('[Universal RTL] Claude Code patch error:', e);
+			}
+
 			if (result) {
 				context.globalState.update('rtlEnabled', true);
 				updateStatusBar(true, ide.name);
 				const checksumInfo = result.checksumResult ? ` (Checksums: ${result.checksumResult.message})` : '';
-				promptRestart(`${ide.name} RTL Support Enabled!${checksumInfo}`);
+				promptRestart(`${ide.name} RTL Support Enabled!${claudeInfo}${checksumInfo}`);
 				if (result.checksumResult && !result.checksumResult.success) {
 					vscode.window.showWarningMessage(`RTL: Checksum fix issue — ${result.checksumResult.message}. You may see an integrity warning.`);
 				}
@@ -325,6 +343,46 @@ function activate(context) {
 		vscode.window.showInformationMessage('📋 Extension link copied to clipboard! Share it with fellow developers.');
 	});
 
+	let patchClaudeCmd = vscode.commands.registerCommand('universal-rtl.patchClaudeCode', () => {
+		try {
+			const res = claudeCodePatcher.patchAll();
+			if (res.count > 0) {
+				promptRestart(`Universal RTL: ${res.message}`);
+			} else {
+				vscode.window.showInformationMessage('Universal RTL: No Claude Code extension installations found to patch.');
+			}
+		} catch (err) {
+			vscode.window.showErrorMessage(`Universal RTL: Failed to patch Claude Code — ${err.message}`);
+		}
+	});
+
+	let unpatchClaudeCmd = vscode.commands.registerCommand('universal-rtl.unpatchClaudeCode', () => {
+		try {
+			const res = claudeCodePatcher.unpatchAll();
+			if (res.count > 0) {
+				promptRestart(`Universal RTL: ${res.message}`);
+			} else {
+				vscode.window.showInformationMessage('Universal RTL: No Claude Code patches were found to remove.');
+			}
+		} catch (err) {
+			vscode.window.showErrorMessage(`Universal RTL: Failed to unpatch Claude Code — ${err.message}`);
+		}
+	});
+
+	let checkClaudeCmd = vscode.commands.registerCommand('universal-rtl.checkClaudeCodeStatus', () => {
+		try {
+			const status = claudeCodePatcher.checkStatus();
+			if (status.found === 0) {
+				vscode.window.showInformationMessage('Universal RTL: No Claude Code installations detected in your IDE extensions folders.');
+			} else {
+				const patched = status.details.filter(d => d.cssPatched).length;
+				vscode.window.showInformationMessage(`Universal RTL: Found ${status.found} Claude Code installation(s). RTL Patched: ${patched}/${status.found}.`);
+			}
+		} catch (err) {
+			vscode.window.showErrorMessage(`Universal RTL: Claude Code check error — ${err.message}`);
+		}
+	});
+
 	context.subscriptions.push(
 		toggleCmd,
 		toggleEditorCmd,
@@ -332,6 +390,9 @@ function activate(context) {
 		fixChecksumsCmd,
 		openReviewCmd,
 		shareCmd,
+		patchClaudeCmd,
+		unpatchClaudeCmd,
+		checkClaudeCmd,
 		myStatusBarItem,
 		editorStateStatusBarItem,
 		vscode.window.onDidChangeActiveTextEditor(() => updateEditorState()),
