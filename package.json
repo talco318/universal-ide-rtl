@@ -3,7 +3,7 @@
   "displayName": "Universal IDE RTL Support",
   "description": "Enables proper Right-to-Left (RTL & BiDi) text rendering for Hebrew, Arabic & Persian in AI Chat across IDEs (Antigravity, Cursor, Windsurf, Kiro, VS Code, Claude Code) and Git Commits.",
   "publisher": "talco",
-  "version": "1.3.9",
+  "version": "1.4.0",
   "icon": "icon.png",
   "license": "MIT",
   "engines": {

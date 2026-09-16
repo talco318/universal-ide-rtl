@@ -6,10 +6,6 @@ const RTL_START_MARKER = '/* ===== START-UNIVERSAL-RTL-CLAUDE-CODE-CSS ===== */'
 const RTL_END_MARKER = '/* ===== END-UNIVERSAL-RTL-CLAUDE-CODE-CSS ===== */';
 const JS_START_MARKER = '/* ===== START-UNIVERSAL-RTL-CLAUDE-CODE-JS ===== */';
 const JS_END_MARKER = '/* ===== END-UNIVERSAL-RTL-CLAUDE-CODE-JS ===== */';
-const PLAN_CSS_START = '/* ===== START-UNIVERSAL-RTL-CLAUDE-PLAN-CSS ===== */';
-const PLAN_CSS_END = '/* ===== END-UNIVERSAL-RTL-CLAUDE-PLAN-CSS ===== */';
-const PLAN_JS_START = '/* ===== START-UNIVERSAL-RTL-CLAUDE-PLAN-JS ===== */';
-const PLAN_JS_END = '/* ===== END-UNIVERSAL-RTL-CLAUDE-PLAN-JS ===== */';
 
 const RTL_CLASS = 'universal-claude-rtl';
 
@@ -55,20 +51,44 @@ ${RTL_START_MARKER}
     color: var(--vscode-button-foreground, #ffffff);
 }
 
-/* User Messages */
-.${RTL_CLASS}[class*="userMessage_"],
+/* User Message Container & Bubble — Aligned to the Right */
+[class*="userMessageContainer_"].${RTL_CLASS},
 .${RTL_CLASS}[class*="userMessageContainer_"],
-.${RTL_CLASS} [class*="userMessage_"],
 .${RTL_CLASS} [class*="userMessageContainer_"] {
+    align-self: flex-end !important;
+    margin-left: auto !important;
+    margin-right: 0 !important;
+    text-align: right !important;
+    direction: rtl !important;
+}
+
+/* User Message Content Body */
+[class*="userMessageContainer_"].${RTL_CLASS} [class*="userMessage_"],
+[class*="userMessage_"].${RTL_CLASS},
+.${RTL_CLASS}[class*="userMessage_"],
+.${RTL_CLASS} [class*="userMessage_"] {
     direction: rtl !important;
     unicode-bidi: plaintext !important;
     text-align: right !important;
-    align-items: flex-end !important;
-    margin-left: auto !important;
-    margin-right: 0 !important;
+}
+
+[class*="userMessageContainer_"].${RTL_CLASS} [class*="expandableContainer_"],
+[class*="userMessageContainer_"].${RTL_CLASS} [class*="content_"],
+[class*="userMessageContainer_"].${RTL_CLASS} span[dir="auto"],
+[class*="userMessageContainer_"].${RTL_CLASS} span {
+    direction: rtl !important;
+    unicode-bidi: plaintext !important;
+    text-align: right !important;
+}
+
+/* Action button on user message (flip position so it does not collide with RTL text) */
+[class*="userMessageContainer_"].${RTL_CLASS} > [class*="container_"] {
+    left: -10px !important;
+    right: auto !important;
 }
 
 /* Claude Markdown Responses (Excluding Thinking Blocks) */
+[class*="timelineMessage_"].${RTL_CLASS} [class*="root_"]:not([class*="thinkingContent_"] [class*="root_"]),
 .${RTL_CLASS}[class*="root_"]:not([class*="thinkingContent_"] [class*="root_"]),
 .${RTL_CLASS} [class*="root_"]:not([class*="thinkingContent_"] [class*="root_"]) {
     direction: rtl !important;
@@ -101,7 +121,9 @@ ${RTL_START_MARKER}
 }
 
 /* Prompt Input auto-detection */
-[class*="messageInputContainer_"] > *,
+[class*="messageInputContainer_"] [contenteditable],
+[class*="messageInputContainer_"] textarea,
+[class*="messageInputContainer_"] input,
 [class*="otherInput_"] [contenteditable] {
     unicode-bidi: plaintext !important;
     text-align: start !important;
@@ -178,7 +200,7 @@ ${RTL_END_MARKER}
 const CLAUDE_CODE_JS = `
 ${JS_START_MARKER}
 (function() {
-    var RTL_REGEX = /[\\u0590-\\u05FF\\u0600-\\u06FF\\u0750-\\u077F\\uFB50-\\uFDFF\\uFE70-\\uFEFE]/;
+    var RTL_REGEX = /[\\u0590-\\u05FF\\u0600-\\u06FF\\u0750-\\u077F\\u08A0-\\u08FF\\uFB50-\\uFDFF\\uFE70-\\uFEFE]/;
     var CLS = '${RTL_CLASS}';
     var BTN_ID = 'universal-rtl-claude-btn';
     var BUBBLE_SEL = '[class*="timelineMessage_"], [class*="userMessageContainer_"], [class*="userMessage_"]';
@@ -187,29 +209,22 @@ ${JS_START_MARKER}
         return RTL_REGEX.test(text || '');
     }
 
-    function processBubble(el) {
+    function checkAndTag(el) {
         if (!el || el.nodeType !== 1) return;
-        if (el.classList.contains(CLS)) return;
-
-        if (isRtlText(el.textContent)) {
+        var text = el.textContent || '';
+        if (isRtlText(text)) {
             el.classList.add(CLS);
-            return;
-        }
-
-        // Observe streaming responses inside bubble
-        var obs = new MutationObserver(function() {
-            if (isRtlText(el.textContent)) {
-                el.classList.add(CLS);
-                obs.disconnect();
+            var parentContainer = el.closest('[class*="userMessageContainer_"]');
+            if (parentContainer) {
+                parentContainer.classList.add(CLS);
             }
-        });
-        obs.observe(el, { childList: true, subtree: true, characterData: true });
+        }
     }
 
-    function scanAllBubbles() {
-        var bubbles = document.querySelectorAll(BUBBLE_SEL);
-        for (var i = 0; i < bubbles.length; i++) {
-            processBubble(bubbles[i]);
+    function scanAll() {
+        var elements = document.querySelectorAll(BUBBLE_SEL);
+        for (var i = 0; i < elements.length; i++) {
+            checkAndTag(elements[i]);
         }
     }
 
@@ -225,8 +240,8 @@ ${JS_START_MARKER}
             var isForced = root.classList.toggle('universal-rtl-forced');
             btn.classList.toggle('active', isForced);
 
-            var bubbles = document.querySelectorAll(BUBBLE_SEL);
-            bubbles.forEach(function(b) {
+            var elements = document.querySelectorAll(BUBBLE_SEL);
+            elements.forEach(function(b) {
                 if (isForced) {
                     b.classList.add(CLS);
                 } else if (!isRtlText(b.textContent)) {
@@ -259,30 +274,15 @@ ${JS_START_MARKER}
     }
 
     function init() {
-        scanAllBubbles();
+        scanAll();
         insertToggleButton();
 
-        var bodyObs = new MutationObserver(function(mutations) {
-            for (var i = 0; i < mutations.length; i++) {
-                var added = mutations[i].addedNodes;
-                for (var j = 0; j < added.length; j++) {
-                    var node = added[j];
-                    if (node.nodeType !== 1) continue;
-                    if (node.matches && node.matches(BUBBLE_SEL)) {
-                        processBubble(node);
-                    }
-                    if (node.querySelectorAll) {
-                        var children = node.querySelectorAll(BUBBLE_SEL);
-                        for (var k = 0; k < children.length; k++) {
-                            processBubble(children[k]);
-                        }
-                    }
-                }
-            }
+        var bodyObs = new MutationObserver(function() {
+            scanAll();
             insertToggleButton();
         });
 
-        bodyObs.observe(document.body, { childList: true, subtree: true });
+        bodyObs.observe(document.body, { childList: true, subtree: true, characterData: true });
     }
 
     if (document.readyState === 'loading') {
@@ -292,34 +292,6 @@ ${JS_START_MARKER}
     }
 })();
 ${JS_END_MARKER}
-`;
-
-/** Plan Preview CSS injection for Claude Code extension.js */
-const PLAN_PREVIEW_CSS = `
-${PLAN_CSS_START}
-#content.universal-claude-rtl {
-    direction: rtl !important;
-    text-align: right !important;
-}
-#content.universal-claude-rtl blockquote {
-    border-left: none !important;
-    border-right: 3px solid var(--vscode-textBlockQuote-border, #007acc) !important;
-    padding-left: 0 !important;
-    padding-right: 12px !important;
-}
-#content.universal-claude-rtl ul, #content.universal-claude-rtl ol {
-    padding-left: 0 !important;
-    padding-right: 32px !important;
-}
-#content.universal-claude-rtl th, #content.universal-claude-rtl td {
-    text-align: right !important;
-}
-#content.universal-claude-rtl pre, #content.universal-claude-rtl code {
-    direction: ltr !important;
-    unicode-bidi: isolate !important;
-    text-align: left !important;
-}
-${PLAN_CSS_END}
 `;
 
 /**
@@ -367,15 +339,13 @@ function findClaudeCodeInstallations() {
                     const fullDirPath = path.join(extDir, entry);
                     const cssPath = path.join(fullDirPath, 'webview', 'index.css');
                     const jsPath = path.join(fullDirPath, 'webview', 'index.js');
-                    const extJsPath = path.join(fullDirPath, 'extension.js');
 
                     if (fs.existsSync(cssPath)) {
                         installations.push({
                             dir: fullDirPath,
                             name: entry,
                             cssPath: cssPath,
-                            jsPath: fs.existsSync(jsPath) ? jsPath : null,
-                            extensionJsPath: fs.existsSync(extJsPath) ? extJsPath : null
+                            jsPath: fs.existsSync(jsPath) ? jsPath : null
                         });
                     }
                 }
@@ -488,7 +458,7 @@ function removeFromFile(filePath, startMarker, endMarker) {
 }
 
 /**
- * Patches all discovered Claude Code installations.
+ * Patches all discovered Claude Code installations (webview CSS & JS only).
  */
 function patchAll() {
     const installations = findClaudeCodeInstallations();
@@ -498,12 +468,19 @@ function patchAll() {
 
     let patchedCount = 0;
     installations.forEach(inst => {
+        // Ensure extension.js is clean (never touched)
+        const extJsPath = path.join(inst.dir, 'extension.js');
+        const extJsBak = extJsPath + '.rtl-backup';
+        if (fs.existsSync(extJsBak)) {
+            try {
+                fs.copyFileSync(extJsBak, extJsPath);
+                fs.unlinkSync(extJsBak);
+            } catch (e) {}
+        }
+
         let ok = injectIntoFile(inst.cssPath, CLAUDE_CODE_CSS, RTL_START_MARKER, RTL_END_MARKER);
         if (inst.jsPath) {
             injectIntoFile(inst.jsPath, CLAUDE_CODE_JS, JS_START_MARKER, JS_END_MARKER);
-        }
-        if (inst.extensionJsPath) {
-            injectIntoFile(inst.extensionJsPath, PLAN_PREVIEW_CSS, PLAN_CSS_START, PLAN_CSS_END);
         }
         if (ok) patchedCount++;
     });
@@ -530,9 +507,6 @@ function unpatchAll() {
         let ok = removeFromFile(inst.cssPath, RTL_START_MARKER, RTL_END_MARKER);
         if (inst.jsPath) {
             removeFromFile(inst.jsPath, JS_START_MARKER, JS_END_MARKER);
-        }
-        if (inst.extensionJsPath) {
-            removeFromFile(inst.extensionJsPath, PLAN_CSS_START, PLAN_CSS_END);
         }
         if (ok) unpatchedCount++;
     });

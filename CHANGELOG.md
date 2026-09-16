@@ -2,6 +2,13 @@
 
 All notable changes to the "Universal IDE RTL Support" extension will be documented in this file.
 
+## [1.4.0] - 2026-09-16
+
+### Fixed
+- **Claude Code Activation Fix**: Isolated Claude Code patching strictly to `webview/index.css` and `webview/index.js`. Completely avoided touching `extension.js`, ensuring Claude Code activates cleanly and `claude-vscode.editor.openLast` is always registered.
+- **Claude Code User Bubble Alignment**: Fixed Right-to-Left alignment for `.userMessageContainer_...` using `align-self: flex-end !important`, `margin-left: auto !important`, and `text-align: right !important`, properly supporting nested `<div class="userMessage_..."><div class="content_..."><span dir="auto">` structures and repositioning the action button to avoid text collision.
+- **Antigravity Checksums Verification**: Verified 100% integrity of all 11 files in Antigravity's `product.json` to guarantee safe and stable operation.
+
 ## [1.3.9] - 2026-09-16
 
 ### Added
