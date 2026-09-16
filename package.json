@@ -1,6 +1,6 @@
 {
   "name": "universal-ide-rtl",
-  "displayName": "Universal IDE RTL Support",
+  "displayName": "Universal RTL: Hebrew & Arabic for Cursor, Claude Code, Windsurf & VS Code",
   "description": "Enables proper Right-to-Left (RTL & BiDi) text rendering for Hebrew, Arabic & Persian in AI Chat across IDEs (Antigravity, Cursor, Windsurf, Kiro, VS Code, Claude Code) and Git Commits.",
   "publisher": "talco",
   "version": "1.4.0",
@@ -61,6 +61,7 @@
   "scripts": {
     "growth:stats": "node scripts/track-growth.js",
     "package": "npx @vscode/vsce package --allow-star-activation",
+    "publish:marketplace": "node scripts/publish-marketplace.js",
     "release": "node create-release.js"
   },
   "contributes": {

@@ -7,5 +7,7 @@ create-release.js
 # Antigravity TimeMachine Micro-History
 .antigravity/
 
-# Internal growth documents
+# Internal growth and marketing documents
 GROWTH_*.md
+marketing/
+icon-old.png

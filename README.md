@@ -1,4 +1,4 @@
-# Universal IDE RTL Support 🌐
+# Universal RTL: Hebrew & Arabic for Cursor, Claude Code, Windsurf & VS Code 🌐
 
 [![Open VSX Version](https://img.shields.io/open-vsx/v/talco/universal-ide-rtl?style=flat-square&color=blue&label=Open%20VSX)](https://open-vsx.org/extension/talco/universal-ide-rtl)
 [![Open VSX Downloads](https://img.shields.io/open-vsx/dt/talco/universal-ide-rtl?style=flat-square&color=brightgreen&label=Downloads)](https://open-vsx.org/extension/talco/universal-ide-rtl)
@@ -10,7 +10,14 @@ A unified extension that adds Right-to-Left (RTL) text support for **Hebrew** an
 
 One extension. All IDEs. Zero hassle.
 
+![Universal IDE RTL Live Demo](media/rtl-demo.gif)
+
+<details>
+<summary><b>🔍 View Side-by-Side Comparison (Before / After)</b></summary>
+
 ![Universal IDE RTL Before and After](media/before-after.png)
+
+</details>
 
 > [!IMPORTANT]
 > **⚡ Quick Activation / הנחיות הפעלה מהירה / تعليمات التفعيل السريع ⚡**

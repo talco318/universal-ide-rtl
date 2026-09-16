@@ -86,9 +86,9 @@ function updateStatusBar(isEnabled, ideName) {
 		myStatusBarItem.tooltip = `${ideName || 'IDE'} RTL is Enabled. Click to disable.`;
 		myStatusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.prominentBackground');
 	} else {
-		myStatusBarItem.text = `$(arrow-right) RTL: OFF`;
-		myStatusBarItem.tooltip = `${ideName || 'IDE'} RTL is Disabled. Click to enable.`;
-		myStatusBarItem.backgroundColor = undefined;
+		myStatusBarItem.text = `$(sparkle) RTL: OFF (Click to Enable)`;
+		myStatusBarItem.tooltip = `${ideName || 'IDE'} RTL is Disabled. Click to activate Hebrew & Arabic RTL.`;
+		myStatusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.warningBackground');
 	}
 	myStatusBarItem.show();
 }
@@ -253,19 +253,38 @@ function activate(context) {
 
 	updateStatusBar(currentState, ide?.name);
 
+	// Zero-Click Auto-Patch for Claude Code (webviews don't require an IDE window reload):
+	try {
+		const claudeAutoPatchDone = context.globalState.get('claudeAutoPatchDone', false);
+		if (!claudeAutoPatchDone) {
+			const res = claudeCodePatcher.patchAll();
+			if (res.count > 0) {
+				console.log(`[Universal RTL] Auto-patched ${res.count} Claude Code installation(s) on initial activation.`);
+			}
+			context.globalState.update('claudeAutoPatchDone', true);
+		}
+	} catch (e) {
+		console.error('[Universal RTL] Claude Code auto-patch on startup error:', e);
+	}
+
 	// 1-Click Onboarding Welcome Notification:
 	// If the extension is freshly installed or RTL is not yet enabled, prompt user once with 1-click Enable & Reload
 	const hasPromptedWelcome = context.globalState.get('hasPromptedWelcome', false);
 	if (ide && !currentState && !hasPromptedWelcome) {
 		context.globalState.update('hasPromptedWelcome', true);
 		vscode.window.showInformationMessage(
-			`🌐 Universal IDE RTL Support: Welcome! Enable Right-to-Left (Hebrew/Arabic) formatting for AI Chat & Git now?`,
+			`🌐 Universal RTL: Welcome! Enable Hebrew & Arabic RTL for AI Chat (Cursor, Claude Code, Windsurf, VS Code) now?`,
 			'Enable & Reload',
 			'Later'
 		).then(selection => {
 			if (selection === 'Enable & Reload') {
 				try {
 					const patchResult = patcher.patch(ide, context.extensionPath);
+					try {
+						claudeCodePatcher.patchAll();
+					} catch (e) {
+						console.error('[Universal RTL] Claude Code welcome patch error:', e);
+					}
 					if (patchResult) {
 						context.globalState.update('rtlEnabled', true);
 						updateStatusBar(true, ide.name);
